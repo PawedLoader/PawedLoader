@@ -11,10 +11,39 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 
-/* Last build: 1712686372704 */
+/* Last build: 1712690337698 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/classes/AssetHandler.js":
+/*!*************************************!*\
+  !*** ./src/classes/AssetHandler.js ***!
+  \*************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const GZip = __webpack_require__(/*! ../classes/GZip */ "./src/classes/GZip.js");
+
+module.exports = class AssetsHandler {
+  constructor() {
+    this.assets = {};
+    this.prefix = null;
+  }
+  saveGZ(assetName, gzBase64, prefix) {
+    prefix = prefix ?? null;
+    // Load gzip asset into memory after decoding the base64
+    this.assets[assetName] = {data: atob(gzBase64), gzip: true, prefix};
+  }
+  get(assetName) {
+    // If the asset is not decompressed then decompress it.
+    const asset = this.assets[assetName];
+    if (asset.gzip) asset.gzip = false, asset.data = new GZip(asset.data).read();
+    if (asset.prefix) return `${asset.prefix}${asset.data}`;
+    return asset.data;
+  }
+}
+
+/***/ }),
 
 /***/ "./src/classes/EventEmitter.js":
 /*!*************************************!*\
@@ -93,6 +122,92 @@ class EventEmitter extends EventTarget {
   }
 }
 module.exports = EventEmitter;
+
+/***/ }),
+
+/***/ "./src/classes/GZip.js":
+/*!*****************************!*\
+  !*** ./src/classes/GZip.js ***!
+  \*****************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const {
+  readBytes,
+  readFlags,
+  readString,
+  readTerminatedString,
+  unixTimestampToDate,
+  bufferToStream,
+  downloadArrayBuffer,
+  downloadBlob,
+  streamToBlob
+} = __webpack_require__(/*! ../utils */ "./src/utils/index.js");
+module.exports = class GZip {
+  #dataView;
+  #index = 0;
+  #crc16;
+
+  header;
+  fileName;
+  comment;
+
+  constructor(arrayBuffer) {
+      this.#dataView = new DataView(arrayBuffer);
+      this.read();
+  }
+  read(){
+      this.header = {
+          signature: readString(this.#dataView, 0, 2), //should be xf8b
+          compressionMethod: this.#dataView.getUint8(1), //should be 0x08
+          flags: readFlags(this.#dataView, 3, ["ftext", "fhcrc", "fextra", "fname", "fcomment", "reserved1", "reserved2", "reserved3"]), //need to figure out if we read extra data in stream
+          modificationTime: unixTimestampToDate(this.#dataView.getUint32(4, true)),
+          extraFlags: this.#dataView.getUint8(8), //not important but is either 2 (best compression) or 4 (fast)
+          os: this.#dataView.getUint8(9), //not useful but usually 0 on windows, 3 Unix, 7 mac
+      };
+      this.#index = 10;
+
+      if(this.header.flags.fextra){
+          const extraLength = this.#dataView.getUint16(this.#index, true);
+          this.extra = readBytes(this.#dataView, this.#index + 2, extraLength);
+          this.#index += extraLength + 2;
+      } else {
+          this.extra = [];
+      }
+
+      if(this.header.flags.fname){
+          this.fileName = readTerminatedString(this.#dataView, this.#index);
+          this.#index += this.fileName.length + 1; //+1 for null terminator
+      } else {
+          this.fileName = "";
+      }
+
+      if(this.header.flags.fcomment){
+          this.comment = readTerminatedString(this.#dataView, this.#index);
+          this.#index += this.comment.length + 1; //+1 for null terminator
+      } else {
+          this.comment = "";
+      }
+
+      if(this.header.flags.fhcrc){
+          this.#crc16 = this.#dataView.getUint16(this.#index, true);
+          this.#index += 2;
+      } else {
+          this.#crc16 = null;
+      }
+
+      //footer
+      this.footer = {
+          crc: this.#dataView.getUint32(this.#dataView.byteLength - 8, true),
+          uncompressedSize: this.#dataView.getUint32(this.#dataView.byteLength - 4, true),
+      }
+  }
+  extract(){
+      //If you don't care about the file data just do this:
+      //return streamToBlob(bufferToStream(this.#dataView.buffer).pipeThrough(new DecompressionStream("gzip")));
+      //Otherwise slice where the data starts to the last 8 bytes
+      return streamToBlob(bufferToStream(this.#dataView.buffer.slice(this.#index, this.#dataView.byteLength - 8)).pipeThrough(new DecompressionStream("deflate-raw")));
+  }
+}
 
 /***/ }),
 
@@ -232,6 +347,8 @@ class GUI extends EventEmitter {
   constructor() {
     // Importing some classes
     this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
+    this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");
+    // Making the ui componnents
     this._modal = this.makeModal;
     this._menubutton = this.makeButton;
   }
@@ -255,6 +372,7 @@ class GUI extends EventEmitter {
     document.body.appendChild(this._modal);
     this.editor.on('OPENED', this.regenButton);
     this.editor.on('CLOSED', this.regenButton);
+    console.log(this.assets.get('icon'));
   }
 
   // Button stuff
@@ -279,11 +397,108 @@ module.exports = new GUI;
 
 /***/ }),
 
+/***/ "./src/ui/assets.js":
+/*!**************************!*\
+  !*** ./src/ui/assets.js ***!
+  \**************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const AssetsHandler = __webpack_require__(/*! ../classes/AssetHandler */ "./src/classes/AssetHandler.js");
+const GUIAssets = new AssetsHandler();
+GUIAssets.saveGZ('icon', `H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==`, 'data:image/svg+xml,');
+module.exports = GUIAssets;
+
+/***/ }),
+
 /***/ "./src/utils/index.js":
 /*!****************************!*\
   !*** ./src/utils/index.js ***!
   \****************************/
-/***/ (() => {
+/***/ ((module) => {
+
+function bufferToStream(arrayBuffer) {
+  return new ReadableStream({
+      start(controller) {
+          controller.enqueue(arrayBuffer);
+          controller.close();
+      }
+  });
+}
+
+function downloadArrayBuffer(arrayBuffer, fileName) {
+  const blob = new Blob([arrayBuffer]);
+  downloadBlob(blob, fileName);
+}
+function downloadBlob(blob, fileName = "download.x"){
+  const blobUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.setAttribute('download', fileName);
+  link.click();
+  window.URL.revokeObjectURL(blobUrl);
+}
+
+async function streamToBlob(stream, type) {
+  const reader = stream.getReader();
+  let done = false;
+  const data = [];
+
+  while (!done) {
+      const result = await reader.read();
+      done = result.done;
+      if (result.value) {
+          data.push(result.value);
+      }
+  }
+
+  return new Blob(data, { type });
+}
+
+function unixTimestampToDate(timestamp){
+  return new Date(timestamp * 1000);
+}
+
+function readString(dataView, offset, length) {
+  const str = [];
+  for (let i = 0; i < length; i++) {
+      str.push(String.fromCharCode(dataView.getUint8(offset + i)));
+  }
+  return str.join("");
+}
+
+function readTerminatedString(dataView, offset) {
+  const str = [];
+  let val;
+  let i = 0;
+
+  while (val != 0) {
+      val = dataView.getUint8(offset + i);
+      if (val != 0) {
+          str.push(String.fromCharCode(val));
+      }
+      i++
+  }
+  return str.join("");
+}
+
+function readBytes(dataView, offset, length) {
+  const bytes = [];
+  for (let i = 0; i < length; i++) {
+      bytes.push(dataView.getUint8(offset + i));
+  }
+  return bytes;
+}
+
+function readFlags(dataView, offset, flagLabels) {
+  const flags = {};
+
+  for (let i = 0; i < flagLabels.length; i++) {
+      const byte = dataView.getUint8(offset + Math.min(i / 8));
+      flags[flagLabels[i]] = (((1 << i) & byte) >> i) === 1;
+  }
+
+  return flags;
+}
 
 /**
  * Calls hasOwnProperty without doing it on the main object.
@@ -292,8 +507,18 @@ module.exports = new GUI;
  */
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
-modules.exports = {
-  hasOwn
+module.exports = {
+  hasOwn,
+  // gzip stuff
+  readBytes,
+  readFlags,
+  readString,
+  readTerminatedString,
+  unixTimestampToDate,
+  bufferToStream,
+  downloadArrayBuffer,
+  downloadBlob,
+  streamToBlob
 };
 
 /***/ }),

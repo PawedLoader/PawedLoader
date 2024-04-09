@@ -5,6 +5,8 @@ class GUI extends EventEmitter {
   constructor() {
     // Importing some classes
     this.editor = require('./editor');
+    this.assets = require('./ui/assets');
+    // Making the ui componnents
     this._modal = this.makeModal;
     this._menubutton = this.makeButton;
   }
@@ -28,6 +30,7 @@ class GUI extends EventEmitter {
     document.body.appendChild(this._modal);
     this.editor.on('OPENED', this.regenButton);
     this.editor.on('CLOSED', this.regenButton);
+    console.log(this.assets.get('icon'));
   }
 
   // Button stuff
