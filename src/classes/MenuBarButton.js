@@ -1,3 +1,6 @@
+const fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
+const buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+
 /**
  * Makes a button
  */
@@ -13,7 +16,7 @@ class MenuBarButton {
     this.node = newButton;
     this.isDropdown = isDropdown ?? false;
     this.image = image ?? undefined;
-    queries.fileGroupBar.appendChild(newButton);
+    fileGroupBar.appendChild(newButton);
     this.hide();
     const images = newButton.querySelectorAll('img');
     if (!this.isDropdown) {

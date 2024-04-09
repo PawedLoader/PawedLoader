@@ -11,9 +11,9 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 
-/* Last build: 1712690337698 */
+/* Last build: 1712691517337 */
 (async function() {
-/******/ (() => { // webpackBootstrap
+/******/ (() => { // webpackBootstrape
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/classes/AssetHandler.js":
@@ -217,6 +217,9 @@ module.exports = class GZip {
   \**************************************/
 /***/ ((module) => {
 
+const fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
+const buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+
 /**
  * Makes a button
  */
@@ -232,7 +235,7 @@ class MenuBarButton {
     this.node = newButton;
     this.isDropdown = isDropdown ?? false;
     this.image = image ?? undefined;
-    queries.fileGroupBar.appendChild(newButton);
+    fileGroupBar.appendChild(newButton);
     this.hide();
     const images = newButton.querySelectorAll('img');
     if (!this.isDropdown) {
@@ -285,7 +288,7 @@ module.exports = MenuBarButton;
 const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
 
 const ReduxStore = ScratchZ.ReduxStore, vm = ScratchZ.vm, runtime = vm.runtime;
-const onDesktopApp = docHref.includes('resources/app.asar');
+const onDesktopApp = document.location.href.includes('resources/app.asar');
 
 module.exports = {
   // Constants
@@ -345,6 +348,7 @@ const MenuBarButton = __webpack_require__(/*! ./classes/MenuBarButton */ "./src/
 
 class GUI extends EventEmitter {
   constructor() {
+    super();
     // Importing some classes
     this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
     this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");

@@ -1,7 +1,7 @@
 const ScratchZ = require('./utils/scratchz');
 
 const ReduxStore = ScratchZ.ReduxStore, vm = ScratchZ.vm, runtime = vm.runtime;
-const onDesktopApp = docHref.includes('resources/app.asar');
+const onDesktopApp = document.location.href.includes('resources/app.asar');
 
 module.exports = {
   // Constants
