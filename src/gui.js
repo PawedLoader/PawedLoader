@@ -3,6 +3,7 @@ const MenuBarButton = require('./classes/MenuBarButton');
 
 class GUI extends EventEmitter {
   constructor() {
+    super();
     // Importing some classes
     this.editor = require('./editor');
     this.assets = require('./ui/assets');
