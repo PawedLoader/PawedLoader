@@ -4,7 +4,7 @@
 // @version      1.00
 // @description  W.I.P
 // @author       Ashimee
-// @match        *://turbowarp.org/editor*
+// @match        *://turbowarp.org/*
 // @match        *://packager.turbowarp.org/
 // @icon         https://www.google.com/s2/favicons?domain=packager.turbowarp.org
 // @grant        none

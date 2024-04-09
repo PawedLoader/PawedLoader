@@ -32,7 +32,7 @@ const { exec } = require('child_process');
           console.error('Failed to read "build/bundle.js".\n', err);
           return err;
         }
-        const built = `${userscriptHeader}\n/* Last build: ${Date.now()} */\n${data}`;
+        const built = `${userscriptHeader}\n/* Last build: ${Date.now()} */\n(async function() {\n${data}\n})();`;
         fs.writeFile('./built.js', built, 'utf8', () => {});
         cleanup();
       });
