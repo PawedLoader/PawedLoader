@@ -1,3 +1,5 @@
+const hasOwn = require('../utils/index').hasOwn;
+
 class EventEmitter extends EventTarget {
   constructor() {
     super();

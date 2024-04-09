@@ -6,5 +6,5 @@
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
 modules.exports = {
-  hasOwn,
+  hasOwn
 };

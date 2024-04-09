@@ -21,9 +21,19 @@ class GUI extends EventEmitter {
   
   // Setup
   setup() {
-    if (this._modal) this._modal = this.makeModal;
-    document.body.appendChild
-    this.editor.on('OPENED',)
+    if (this._modal) {
+      try { this._modal.remove() } catch {};
+      this._modal = this.makeModal;
+    }
+    document.body.appendChild(this._modal);
+    this.editor.on('OPENED', this.regenButton);
+    this.editor.on('CLOSED', this.regenButton);
+  }
+
+  // Button stuff
+  regenButton() {
+    this._menubutton = this.makeButton;
+    this._menubutton.show();
   }
 
   // Events
