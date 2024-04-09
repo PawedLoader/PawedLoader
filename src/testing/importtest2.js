@@ -1,1 +1,0 @@
-console.log(require('./importtest1').abc());
