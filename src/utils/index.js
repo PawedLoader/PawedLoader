@@ -82,6 +82,15 @@ function readFlags(dataView, offset, flagLabels) {
   return flags;
 }
 
+function base64ToArrayBuffer(base64) {
+  var binaryString = atob(base64);
+  var bytes = new Uint8Array(binaryString.length);
+  for (var i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
 /**
  * Calls hasOwnProperty without doing it on the main object.
  * @param {Object} object The object to check for the key on.
@@ -89,7 +98,14 @@ function readFlags(dataView, offset, flagLabels) {
  */
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
+const wait = (ms) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 module.exports = {
+  wait,
   hasOwn,
   // gzip stuff
   readBytes,
@@ -100,5 +116,6 @@ module.exports = {
   bufferToStream,
   downloadArrayBuffer,
   downloadBlob,
-  streamToBlob
+  streamToBlob,
+  base64ToArrayBuffer
 };

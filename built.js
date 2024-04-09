@@ -7,13 +7,14 @@
 // @match        *://turbowarp.org/*
 // @match        *://packager.turbowarp.org/
 // @icon         https://www.google.com/s2/favicons?domain=packager.turbowarp.org
+// @run-at       document-end
 // @grant        none
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 
-/* Last build: 1712691517337 */
+/* Last build: 1712694608984 */
 (async function() {
-/******/ (() => { // webpackBootstrape
+/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/classes/AssetHandler.js":
@@ -23,21 +24,21 @@
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const GZip = __webpack_require__(/*! ../classes/GZip */ "./src/classes/GZip.js");
+const base64ToArrayBuffer = (__webpack_require__(/*! ../utils/index */ "./src/utils/index.js").base64ToArrayBuffer);
 
 module.exports = class AssetsHandler {
   constructor() {
     this.assets = {};
     this.prefix = null;
   }
-  saveGZ(assetName, gzBase64, prefix) {
+  async saveGZ(assetName, gzBase64, prefix) {
     prefix = prefix ?? null;
-    // Load gzip asset into memory after decoding the base64
-    this.assets[assetName] = {data: atob(gzBase64), gzip: true, prefix};
+    // Load asset into memory after decoding the base64 and unzipping
+    this.assets[assetName] = {data: (await (await (new GZip(base64ToArrayBuffer(gzBase64)).extract())).text()), prefix};
   }
   get(assetName) {
-    // If the asset is not decompressed then decompress it.
     const asset = this.assets[assetName];
-    if (asset.gzip) asset.gzip = false, asset.data = new GZip(asset.data).read();
+    if (asset.data?.read) asset.data = asset.data.read();
     if (asset.prefix) return `${asset.prefix}${asset.data}`;
     return asset.data;
   }
@@ -317,10 +318,12 @@ class Editor extends EventEmitter {
     super();
     // Setup
     this._wasInEditor = this.inEditor;
+    this._wasGUIavailable = false;
     // Events
     this.register('OPENED');
     this.register('CLOSED');
     ReduxStore.subscribe(() => {
+      console.log(ReduxStore.getState().scratchGui.projectState.loadingState);
       if (this._wasInEditor !== this.inEditor) {
         if (this._wasInEditor) this.emit('CLOSED');
         else this.emit('OPENED');
@@ -328,7 +331,7 @@ class Editor extends EventEmitter {
     });
   }
   get inEditor() {
-    const state = ReduxStore?.getState();
+    const state = ReduxStore.getState();
     if (!state) return false;
     return !state.scratchGui.mode.isPlayerOnly;
   }
@@ -359,7 +362,7 @@ class GUI extends EventEmitter {
 
   // Makers
   get makeButton() {
-    const menuButton = new MenuBarButton('<h1>Pawloader</h1>', null, false);
+    const menuButton = new MenuBarButton('<h1>PawedLoader</h1>', null, false);
     menuButton.node.addEventListener('click', (event) => this.menuButtonClicked(event));
     return menuButton;
   }
@@ -368,15 +371,19 @@ class GUI extends EventEmitter {
   }
   
   // Setup
-  setup() {
+  async setup() {
     if (this._modal) {
       try { this._modal.remove() } catch {};
       this._modal = this.makeModal;
     }
     document.body.appendChild(this._modal);
-    this.editor.on('OPENED', this.regenButton);
-    this.editor.on('CLOSED', this.regenButton);
-    console.log(this.assets.get('icon'));
+    this.editor.on('OPENED', () => this.regenButton());
+    this.editor.on('CLOSED', () => this.regenButton());
+    await this.assets.loadAssets();
+    setTimeout(() => {
+      // Do stuff that needs to interact with the gui.
+      this.regenButton();
+    }, 1000);
   }
 
   // Button stuff
@@ -409,7 +416,10 @@ module.exports = new GUI;
 
 const AssetsHandler = __webpack_require__(/*! ../classes/AssetHandler */ "./src/classes/AssetHandler.js");
 const GUIAssets = new AssetsHandler();
-GUIAssets.saveGZ('icon', `H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==`, 'data:image/svg+xml,');
+async function loadAssets() {
+  await GUIAssets.saveGZ('icon', `H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==`, 'data:image/svg+xml,');
+}
+GUIAssets.loadAssets = loadAssets;
 module.exports = GUIAssets;
 
 /***/ }),
@@ -504,6 +514,15 @@ function readFlags(dataView, offset, flagLabels) {
   return flags;
 }
 
+function base64ToArrayBuffer(base64) {
+  var binaryString = atob(base64);
+  var bytes = new Uint8Array(binaryString.length);
+  for (var i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
 /**
  * Calls hasOwnProperty without doing it on the main object.
  * @param {Object} object The object to check for the key on.
@@ -511,7 +530,14 @@ function readFlags(dataView, offset, flagLabels) {
  */
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
+const wait = (ms) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 module.exports = {
+  wait,
   hasOwn,
   // gzip stuff
   readBytes,
@@ -522,7 +548,8 @@ module.exports = {
   bufferToStream,
   downloadArrayBuffer,
   downloadBlob,
-  streamToBlob
+  streamToBlob,
+  base64ToArrayBuffer
 };
 
 /***/ }),
@@ -572,8 +599,10 @@ var __webpack_exports__ = {};
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
+const vm = (__webpack_require__(/*! ./defs */ "./src/defs.js").vm);
 const GUI = __webpack_require__(/*! ./gui */ "./src/gui.js");
 GUI.setup();
+vm.paw = GUI;
 })();
 
 /******/ })()

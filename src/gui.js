@@ -14,7 +14,7 @@ class GUI extends EventEmitter {
 
   // Makers
   get makeButton() {
-    const menuButton = new MenuBarButton('<h1>Pawloader</h1>', null, false);
+    const menuButton = new MenuBarButton('PawedLoader', null, false);
     menuButton.node.addEventListener('click', (event) => this.menuButtonClicked(event));
     return menuButton;
   }
@@ -23,15 +23,16 @@ class GUI extends EventEmitter {
   }
   
   // Setup
-  setup() {
+  async setup() {
     if (this._modal) {
       try { this._modal.remove() } catch {};
       this._modal = this.makeModal;
     }
     document.body.appendChild(this._modal);
-    this.editor.on('OPENED', this.regenButton);
-    this.editor.on('CLOSED', this.regenButton);
-    console.log(this.assets.get('icon'));
+    this.editor.on('OPENED', () => this.regenButton());
+    this.editor.on('CLOSED', () => this.regenButton());
+    this.editor.on('GUI_LOADED', () => this.regenButton());
+    await this.assets.loadAssets();
   }
 
   // Button stuff

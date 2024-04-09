@@ -1,19 +1,19 @@
 const GZip = require('../classes/GZip');
+const base64ToArrayBuffer = require('../utils/index').base64ToArrayBuffer;
 
 module.exports = class AssetsHandler {
   constructor() {
     this.assets = {};
     this.prefix = null;
   }
-  saveGZ(assetName, gzBase64, prefix) {
+  async saveGZ(assetName, gzBase64, prefix) {
     prefix = prefix ?? null;
-    // Load gzip asset into memory after decoding the base64
-    this.assets[assetName] = {data: atob(gzBase64), gzip: true, prefix};
+    // Load asset into memory after decoding the base64 and unzipping
+    this.assets[assetName] = {data: (await (await (new GZip(base64ToArrayBuffer(gzBase64)).extract())).text()), prefix};
   }
   get(assetName) {
-    // If the asset is not decompressed then decompress it.
     const asset = this.assets[assetName];
-    if (asset.gzip) asset.gzip = false, asset.data = new GZip(asset.data).read();
+    if (asset.data?.read) asset.data = asset.data.read();
     if (asset.prefix) return `${asset.prefix}${asset.data}`;
     return asset.data;
   }

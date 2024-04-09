@@ -7,6 +7,7 @@
 // @match        *://turbowarp.org/*
 // @match        *://packager.turbowarp.org/
 // @icon         https://www.google.com/s2/favicons?domain=packager.turbowarp.org
+// @run-at       document-end
 // @grant        none
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
