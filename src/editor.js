@@ -1,4 +1,5 @@
 const EventEmitter = require('./classes/EventEmitter');
+const { ReduxStore } = require('./defs');
 
 class Editor extends EventEmitter {
   constructor() {
