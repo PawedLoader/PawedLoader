@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         PawedLoader
 // @namespace    https://google.com/
-// @version      1.00
+// @version      0.0.1
 // @description  W.I.P
 // @author       Ashimee
 // @match        *://turbowarp.org/*
 // @match        *://packager.turbowarp.org/
 // @icon         https://www.google.com/s2/favicons?domain=packager.turbowarp.org
 // @grant        none
-// @license      MIT & LGPL-3.0
+// @license      MIT and LGPL-3.0
 // ==/UserScript==
 
-/* Last build: 1712685241780 */
+/* Last build: 1712686372704 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -20,7 +20,9 @@
 /*!*************************************!*\
   !*** ./src/classes/EventEmitter.js ***!
   \*************************************/
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const hasOwn = (__webpack_require__(/*! ../utils/index */ "./src/utils/index.js").hasOwn);
 
 class EventEmitter extends EventTarget {
   constructor() {
@@ -246,9 +248,19 @@ class GUI extends EventEmitter {
   
   // Setup
   setup() {
-    if (this._modal) this._modal = this.makeModal;
-    document.body.appendChild
-    this.editor.on('OPENED',)
+    if (this._modal) {
+      try { this._modal.remove() } catch {};
+      this._modal = this.makeModal;
+    }
+    document.body.appendChild(this._modal);
+    this.editor.on('OPENED', this.regenButton);
+    this.editor.on('CLOSED', this.regenButton);
+  }
+
+  // Button stuff
+  regenButton() {
+    this._menubutton = this.makeButton;
+    this._menubutton.show();
   }
 
   // Events
@@ -264,6 +276,25 @@ class GUI extends EventEmitter {
   }
 }
 module.exports = new GUI;
+
+/***/ }),
+
+/***/ "./src/utils/index.js":
+/*!****************************!*\
+  !*** ./src/utils/index.js ***!
+  \****************************/
+/***/ (() => {
+
+/**
+ * Calls hasOwnProperty without doing it on the main object.
+ * @param {Object} object The object to check for the key on.
+ * @param {String} key The key to check for.
+ */
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+
+modules.exports = {
+  hasOwn
+};
 
 /***/ }),
 
