@@ -10,14 +10,3 @@
 // @grant        none
 // @license      MIT & LGPL-3.0
 // ==/UserScript==
-
-/* Last build: 1712680425736 */
-/******/ (() => { // webpackBootstrap
-var __webpack_exports__ = {};
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-console.log(123);
-/******/ })()
-;
-//# sourceMappingURL=bundle.js.map
