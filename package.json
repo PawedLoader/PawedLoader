@@ -1,0 +1,13 @@
+{
+  "name": "pawedloader",
+  "version": "1.0.0",
+  "description": "I don't really know, dragocuven wanted a userscript thing so I made a repo.",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"Error: no build specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
