@@ -28,7 +28,7 @@ class GUI extends EventEmitter {
 
   // Events
   menuButtonClicked(event) {
-    
+    this.show();
   }
 
   show() {
