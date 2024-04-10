@@ -12,31 +12,15 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1712728884600 */
+/* Last build: 1712732471612 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/addons/api.js":
-/*!***************************!*\
-  !*** ./src/addons/api.js ***!
-  \***************************/
-/***/ ((module) => {
-
-class AddonAPI {
-  constructor() {}
-  getData(addonID) {
-    return {};
-  }
-}
-module.exports = new AddonAPI;
-
-/***/ }),
-
-/***/ "./src/addons/example/main.js":
-/*!************************************!*\
-  !*** ./src/addons/example/main.js ***!
-  \************************************/
+/***/ "./src/addons/addon-example/main.js":
+/*!******************************************!*\
+  !*** ./src/addons/addon-example/main.js ***!
+  \******************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const addonAPI = __webpack_require__(/*! ../api */ "./src/addons/api.js");
@@ -61,43 +45,81 @@ module.exports = (function(addonData) {
 
 /***/ }),
 
-/***/ "./src/addons/export.js":
-/*!******************************!*\
-  !*** ./src/addons/export.js ***!
-  \******************************/
+/***/ "./src/addons/api.js":
+/*!***************************!*\
+  !*** ./src/addons/api.js ***!
+  \***************************/
+/***/ ((module) => {
+
+class AddonAPI {
+  constructor() {}
+  getData(addonID) {
+    return {};
+  }
+}
+module.exports = new AddonAPI;
+
+/***/ }),
+
+/***/ "./src/addons/classes/AddonExporter.js":
+/*!*********************************************!*\
+  !*** ./src/addons/classes/AddonExporter.js ***!
+  \*********************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-// Addon files
-const addons = [];
-
-// DO NOT MODIFY!!
-
-class AddonExporter {
+module.exports = class AddonExporter {
   constructor() {
-    this.api = __webpack_require__(/*! ./api */ "./src/addons/api.js");
-    this.addonIds = addons;
+    this.addonIds = __webpack_require__(/*! ../export */ "./src/addons/export.js");
   }
   get addons() {
     const _addons = {};
     addons.forEach(addonID => {
-      const addon = __webpack_require__("./src/addons sync recursive ^\\.\\/.*\\/main\\.js$")(`./${addonID}/main.js`);
+      const addon = __webpack_require__("./src/addons sync recursive ^\\.\\/addon\\-.*\\/main\\.js$")(`./addon-${addonID}/main.js`);
       _addons[addonID] = addon;
     });
     return addons;
   }
 }
-module.exports = new AddonExporter;
 
 /***/ }),
 
-/***/ "./src/addons sync recursive ^\\.\\/.*\\/main\\.js$":
-/*!*********************************************!*\
-  !*** ./src/addons/ sync ^\.\/.*\/main\.js$ ***!
-  \*********************************************/
+/***/ "./src/addons/export.js":
+/*!******************************!*\
+  !*** ./src/addons/export.js ***!
+  \******************************/
+/***/ ((module) => {
+
+// Addon files
+module.exports = [];
+
+/***/ }),
+
+/***/ "./src/addons/manager.js":
+/*!*******************************!*\
+  !*** ./src/addons/manager.js ***!
+  \*******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const AddonExporter = __webpack_require__(/*! ./classes/AddonExporter */ "./src/addons/classes/AddonExporter.js");
+class Addons extends AddonExporter {
+  constructor() {
+    super();
+    this.api = __webpack_require__(/*! ./api */ "./src/addons/api.js");
+  }
+  load() {}
+}
+module.exports = new Addons;
+
+/***/ }),
+
+/***/ "./src/addons sync recursive ^\\.\\/addon\\-.*\\/main\\.js$":
+/*!****************************************************!*\
+  !*** ./src/addons/ sync ^\.\/addon\-.*\/main\.js$ ***!
+  \****************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var map = {
-	"./example/main.js": "./src/addons/example/main.js"
+	"./addon-example/main.js": "./src/addons/addon-example/main.js"
 };
 
 
@@ -118,7 +140,7 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = "./src/addons sync recursive ^\\.\\/.*\\/main\\.js$";
+webpackContext.id = "./src/addons sync recursive ^\\.\\/addon\\-.*\\/main\\.js$";
 
 /***/ }),
 
@@ -146,6 +168,14 @@ module.exports = class AssetsHandler {
     if (asset.data?.read) asset.data = asset.data.read();
     if (asset.prefix) return `${asset.prefix}${asset.data}`;
     return asset.data;
+  }
+  update(assetName, updator) {
+    const asset = this.assets[assetName];
+    if (typeof updator === 'function') {
+      asset.data = updator(asset.data);
+      return;
+    }
+    asset.data = updator;
   }
 }
 
@@ -472,6 +502,8 @@ module.exports = new Editor;
   \********************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
+
 const EventEmitter = __webpack_require__(/*! ./classes/EventEmitter */ "./src/classes/EventEmitter.js");
 const MenuBarButton = __webpack_require__(/*! ./classes/MenuBarButton */ "./src/classes/MenuBarButton.js");
 const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
@@ -481,14 +513,12 @@ class GUI extends EventEmitter {
     super();
     // Setup events
     this.register('ASSETS_LOADED');
-    this.state = new EventEmitter();
-    this.state.register('ui/render');
     // Importing some classes
     this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
-    this.addons = __webpack_require__(/*! ./addons/export */ "./src/addons/export.js");
+    this.addons = __webpack_require__(/*! ./addons/manager */ "./src/addons/manager.js");
     this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");
     // Making the ui componnents
-    this._modal = this.makeModal;
+    this._modal = null;
     this._menubutton = this.makeButton;
   }
 
@@ -499,17 +529,22 @@ class GUI extends EventEmitter {
     return menuButton;
   }
   get makeModal() {
-    return document.createElement('dialog');
+    if (this._modal) this._modal.remove();
+    const modal = document.createElement('dialog');
+    document.body.appendChild(modal);
+    this._modal = modal;
+    this.constructGUI();
+    return modal;
   }
   
   // Setup
   setupAllGUI() {
     if (this._modal) {
       try { this._modal.remove() } catch {};
-      this._modal = this.makeModal;
     }
-    document.body.appendChild(this._modal);
+    this._modal = this.makeModal;
     this.regenButton();
+    minilog.log('GUI Built');
   }
   async setup() {
     this.editor.once('GUI_LOADED', () => {
@@ -517,10 +552,10 @@ class GUI extends EventEmitter {
     });
     this.assets.loadAssets().then(() => {
       this.emit('ASSETS_LOADED');
+      minilog.log('Assets loaded!');
       this.editor.on('OPENED/gui_events', () => this.regenButton());
       this.editor.on('CLOSED/gui_events', () => this.regenButton());
-      if (this.editor.GUIavailable) this.setupAllGUI();
-      else this.editor.on('GUI_LOADED', () => this.setupAllGUI());
+      this.setupAllGUI();
     });
   }
 
@@ -538,11 +573,15 @@ class GUI extends EventEmitter {
 
   // GUI
   constructGUI() {
+    const temp = document.createElement('img');
+    temp.src = this.assets.get('icon');
+    temp.width = 16;
+    temp.height = 16;
+    this._modal.appendChild(temp);
   }
 
   show() {
-    this._modal.innerHTML = '';
-    this.constructGUI();
+    this._modal = this.makeModal;
     this._modal.showModal();
   }
 
@@ -564,7 +603,8 @@ module.exports = new GUI;
 const AssetsHandler = __webpack_require__(/*! ../classes/AssetHandler */ "./src/classes/AssetHandler.js");
 const GUIAssets = new AssetsHandler();
 async function loadAssets() {
-  await GUIAssets.saveGZ('icon', `H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==`, 'data:image/svg+xml,');
+  await GUIAssets.saveGZ('icon', `H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==`, 'data:image/svg+xml;base64,');
+  GUIAssets.update('icon', (data) => btoa(data.replace('<svg ', '<svg style="fill:#ffffff;" ')));
 }
 GUIAssets.loadAssets = loadAssets;
 module.exports = GUIAssets;
@@ -701,6 +741,20 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./src/utils/minilog.js":
+/*!******************************!*\
+  !*** ./src/utils/minilog.js ***!
+  \******************************/
+/***/ ((module) => {
+
+const prefix = 'PawLoader |';
+const log = (...a) => console.log(prefix, ...a);
+const warn = (...a) => console.warn(prefix, ...a);
+const error = (...a) => console.error(prefix, ...a);
+module.exports = { log, warn, error };
+
+/***/ }),
+
 /***/ "./src/utils/scratchz.js":
 /*!*******************************!*\
   !*** ./src/utils/scratchz.js ***!
@@ -752,10 +806,13 @@ var __webpack_exports__ = {};
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
+const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
 const vm = (__webpack_require__(/*! ./defs */ "./src/defs.js").vm);
 const GUI = __webpack_require__(/*! ./gui */ "./src/gui.js");
 GUI.setup();
 vm.paw = GUI;
+GUI.addons.load();
+minilog.log('Loaded.');
 })();
 
 /******/ })()

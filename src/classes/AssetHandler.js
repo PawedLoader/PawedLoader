@@ -17,4 +17,12 @@ module.exports = class AssetsHandler {
     if (asset.prefix) return `${asset.prefix}${asset.data}`;
     return asset.data;
   }
+  update(assetName, updator) {
+    const asset = this.assets[assetName];
+    if (typeof updator === 'function') {
+      asset.data = updator(asset.data);
+      return;
+    }
+    asset.data = updator;
+  }
 }

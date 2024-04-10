@@ -1,3 +1,5 @@
+const minilog = require('./utils/minilog');
+
 const EventEmitter = require('./classes/EventEmitter');
 const MenuBarButton = require('./classes/MenuBarButton');
 const ScratchZ = require('./utils/scratchz');
@@ -7,14 +9,12 @@ class GUI extends EventEmitter {
     super();
     // Setup events
     this.register('ASSETS_LOADED');
-    this.state = new EventEmitter();
-    this.state.register('ui/render');
     // Importing some classes
     this.editor = require('./editor');
-    this.addons = require('./addons/export');
+    this.addons = require('./addons/manager');
     this.assets = require('./ui/assets');
     // Making the ui componnents
-    this._modal = this.makeModal;
+    this._modal = null;
     this._menubutton = this.makeButton;
   }
 
@@ -25,17 +25,22 @@ class GUI extends EventEmitter {
     return menuButton;
   }
   get makeModal() {
-    return document.createElement('dialog');
+    if (this._modal) this._modal.remove();
+    const modal = document.createElement('dialog');
+    document.body.appendChild(modal);
+    this._modal = modal;
+    this.constructGUI();
+    return modal;
   }
   
   // Setup
   setupAllGUI() {
     if (this._modal) {
       try { this._modal.remove() } catch {};
-      this._modal = this.makeModal;
     }
-    document.body.appendChild(this._modal);
+    this._modal = this.makeModal;
     this.regenButton();
+    minilog.log('GUI Built');
   }
   async setup() {
     this.editor.once('GUI_LOADED', () => {
@@ -43,10 +48,10 @@ class GUI extends EventEmitter {
     });
     this.assets.loadAssets().then(() => {
       this.emit('ASSETS_LOADED');
+      minilog.log('Assets loaded!');
       this.editor.on('OPENED/gui_events', () => this.regenButton());
       this.editor.on('CLOSED/gui_events', () => this.regenButton());
-      if (this.editor.GUIavailable) this.setupAllGUI();
-      else this.editor.on('GUI_LOADED', () => this.setupAllGUI());
+      this.setupAllGUI();
     });
   }
 
@@ -64,11 +69,15 @@ class GUI extends EventEmitter {
 
   // GUI
   constructGUI() {
+    const temp = document.createElement('img');
+    temp.src = this.assets.get('icon');
+    temp.width = 16;
+    temp.height = 16;
+    this._modal.appendChild(temp);
   }
 
   show() {
-    this._modal.innerHTML = '';
-    this.constructGUI();
+    this._modal = this.makeModal;
     this._modal.showModal();
   }
 
