@@ -11,6 +11,7 @@ class GUI extends EventEmitter {
     this.state.register('ui/render');
     // Importing some classes
     this.editor = require('./editor');
+    this.addons = require('./addons/export');
     this.assets = require('./ui/assets');
     // Making the ui componnents
     this._modal = this.makeModal;

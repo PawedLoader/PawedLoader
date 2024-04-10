@@ -11,11 +11,116 @@
 // @grant        none
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
-
-/* Last build: 1712706928262 */
+// you lose the game :trol:
+/* Last build: 1712728884600 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/addons/api.js":
+/*!***************************!*\
+  !*** ./src/addons/api.js ***!
+  \***************************/
+/***/ ((module) => {
+
+class AddonAPI {
+  constructor() {}
+  getData(addonID) {
+    return {};
+  }
+}
+module.exports = new AddonAPI;
+
+/***/ }),
+
+/***/ "./src/addons/example/main.js":
+/*!************************************!*\
+  !*** ./src/addons/example/main.js ***!
+  \************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const addonAPI = __webpack_require__(/*! ../api */ "./src/addons/api.js");
+
+const addonID = 'AshimeesExample';
+module.exports = (function(addonData) {
+  
+  function setup() {
+    addonData['cool'] = true;
+    console.log('Wow!');
+  }
+  function main() {}
+
+  return {
+    name: 'Example - Mhm', id: addonID,
+    description: 'a very cool addon!',
+    lastupdate: '04/05/2024',
+    /* DO NOT CHANGE */
+    setup, data: addonData
+  }
+})(addonAPI.getData(addonID));
+
+/***/ }),
+
+/***/ "./src/addons/export.js":
+/*!******************************!*\
+  !*** ./src/addons/export.js ***!
+  \******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+// Addon files
+const addons = [];
+
+// DO NOT MODIFY!!
+
+class AddonExporter {
+  constructor() {
+    this.api = __webpack_require__(/*! ./api */ "./src/addons/api.js");
+    this.addonIds = addons;
+  }
+  get addons() {
+    const _addons = {};
+    addons.forEach(addonID => {
+      const addon = __webpack_require__("./src/addons sync recursive ^\\.\\/.*\\/main\\.js$")(`./${addonID}/main.js`);
+      _addons[addonID] = addon;
+    });
+    return addons;
+  }
+}
+module.exports = new AddonExporter;
+
+/***/ }),
+
+/***/ "./src/addons sync recursive ^\\.\\/.*\\/main\\.js$":
+/*!*********************************************!*\
+  !*** ./src/addons/ sync ^\.\/.*\/main\.js$ ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var map = {
+	"./example/main.js": "./src/addons/example/main.js"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./src/addons sync recursive ^\\.\\/.*\\/main\\.js$";
+
+/***/ }),
 
 /***/ "./src/classes/AssetHandler.js":
 /*!*************************************!*\
@@ -333,9 +438,6 @@ class Editor extends EventEmitter {
         else this.emit('OPENED');
       }
     });
-    this.once('OPENED', () => {
-      this.emit('SCRATCHBLOCKS', ScratchZ.Blocks);
-    });
     if (this._wasInEditor) setTimeout(() => {
       this.emit('OPENED', 0);
     }, 500);
@@ -372,6 +474,7 @@ module.exports = new Editor;
 
 const EventEmitter = __webpack_require__(/*! ./classes/EventEmitter */ "./src/classes/EventEmitter.js");
 const MenuBarButton = __webpack_require__(/*! ./classes/MenuBarButton */ "./src/classes/MenuBarButton.js");
+const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
 
 class GUI extends EventEmitter {
   constructor() {
@@ -382,6 +485,7 @@ class GUI extends EventEmitter {
     this.state.register('ui/render');
     // Importing some classes
     this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
+    this.addons = __webpack_require__(/*! ./addons/export */ "./src/addons/export.js");
     this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");
     // Making the ui componnents
     this._modal = this.makeModal;
@@ -408,6 +512,9 @@ class GUI extends EventEmitter {
     this.regenButton();
   }
   async setup() {
+    this.editor.once('GUI_LOADED', () => {
+      if (this.editor.inEditor) this.editor.emit('SCRATCHBLOCKS', ScratchZ.Blocks);
+    });
     this.assets.loadAssets().then(() => {
       this.emit('ASSETS_LOADED');
       this.editor.on('OPENED/gui_events', () => this.regenButton());
@@ -631,6 +738,12 @@ module.exports = new ScratchZ;
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
