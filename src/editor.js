@@ -1,5 +1,5 @@
 const EventEmitter = require('./classes/EventEmitter');
-const { ReduxStore } = require('./defs');
+const { ReduxStore, ScratchZ } = require('./defs');
 
 class Editor extends EventEmitter {
   constructor() {
@@ -8,8 +8,8 @@ class Editor extends EventEmitter {
     this._wasInEditor = this.inEditor;
     this._loadingGUI = !this.GUIavailable;
     // Events
-    this.register('OPENED');
-    this.register('CLOSED');
+    this.register('OPENED'); this.register('OPENED/gui_events');
+    this.register('CLOSED'); this.register('CLOSED/gui_events');
     this.register('GUI_LOADED');
     ReduxStore.subscribe(() => {
       if (this._loadingGUI) {
@@ -20,6 +20,15 @@ class Editor extends EventEmitter {
         if (this._wasInEditor) this.emit('CLOSED');
         else this.emit('OPENED');
       }
+    });
+    if (this._wasInEditor) setTimeout(() => {
+      this.emit('OPENED', 0);
+    }, 500);
+    this.on('OPENED', (guiDelay) => {
+      setTimeout(() => this.emit('OPENED/gui_events'), guiDelay ?? 500);
+    });
+    this.on('CLOSED', () => {
+      setTimeout(() => this.emit('CLOSED/gui_events'), 500);
     });
   }
   get GUIavailable() {

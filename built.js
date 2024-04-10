@@ -12,7 +12,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 
-/* Last build: 1712694608984 */
+/* Last build: 1712706928262 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -311,29 +311,53 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const EventEmitter = __webpack_require__(/*! ./classes/EventEmitter */ "./src/classes/EventEmitter.js");
-const { ReduxStore } = __webpack_require__(/*! ./defs */ "./src/defs.js");
+const { ReduxStore, ScratchZ } = __webpack_require__(/*! ./defs */ "./src/defs.js");
 
 class Editor extends EventEmitter {
   constructor() {
     super();
     // Setup
     this._wasInEditor = this.inEditor;
-    this._wasGUIavailable = false;
+    this._loadingGUI = !this.GUIavailable;
     // Events
-    this.register('OPENED');
-    this.register('CLOSED');
+    this.register('OPENED'); this.register('OPENED/gui_events');
+    this.register('CLOSED'); this.register('CLOSED/gui_events');
+    this.register('GUI_LOADED');
     ReduxStore.subscribe(() => {
-      console.log(ReduxStore.getState().scratchGui.projectState.loadingState);
+      if (this._loadingGUI) {
+        if (this.GUIavailable) this._loadingGUI = false;
+        this.emit('GUI_LOADED');
+      }
       if (this._wasInEditor !== this.inEditor) {
         if (this._wasInEditor) this.emit('CLOSED');
         else this.emit('OPENED');
       }
     });
+    this.once('OPENED', () => {
+      this.emit('SCRATCHBLOCKS', ScratchZ.Blocks);
+    });
+    if (this._wasInEditor) setTimeout(() => {
+      this.emit('OPENED', 0);
+    }, 500);
+    this.on('OPENED', (guiDelay) => {
+      setTimeout(() => this.emit('OPENED/gui_events'), guiDelay ?? 500);
+    });
+    this.on('CLOSED', () => {
+      setTimeout(() => this.emit('CLOSED/gui_events'), 500);
+    });
+  }
+  get GUIavailable() {
+    return this.projectState.loadingState !== 'LOADING_VM_NEW_DEFAULT';
   }
   get inEditor() {
     const state = ReduxStore.getState();
     if (!state) return false;
     return !state.scratchGui.mode.isPlayerOnly;
+  }
+  get projectState() {
+    const state = ReduxStore.getState();
+    if (!state) return false;
+    return state.scratchGui.projectState;
   }
 }
 module.exports = new Editor;
@@ -352,6 +376,10 @@ const MenuBarButton = __webpack_require__(/*! ./classes/MenuBarButton */ "./src/
 class GUI extends EventEmitter {
   constructor() {
     super();
+    // Setup events
+    this.register('ASSETS_LOADED');
+    this.state = new EventEmitter();
+    this.state.register('ui/render');
     // Importing some classes
     this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
     this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");
@@ -362,7 +390,7 @@ class GUI extends EventEmitter {
 
   // Makers
   get makeButton() {
-    const menuButton = new MenuBarButton('<h1>PawedLoader</h1>', null, false);
+    const menuButton = new MenuBarButton('PawedLoader', null, false);
     menuButton.node.addEventListener('click', (event) => this.menuButtonClicked(event));
     return menuButton;
   }
@@ -371,23 +399,27 @@ class GUI extends EventEmitter {
   }
   
   // Setup
-  async setup() {
+  setupAllGUI() {
     if (this._modal) {
       try { this._modal.remove() } catch {};
       this._modal = this.makeModal;
     }
     document.body.appendChild(this._modal);
-    this.editor.on('OPENED', () => this.regenButton());
-    this.editor.on('CLOSED', () => this.regenButton());
-    await this.assets.loadAssets();
-    setTimeout(() => {
-      // Do stuff that needs to interact with the gui.
-      this.regenButton();
-    }, 1000);
+    this.regenButton();
+  }
+  async setup() {
+    this.assets.loadAssets().then(() => {
+      this.emit('ASSETS_LOADED');
+      this.editor.on('OPENED/gui_events', () => this.regenButton());
+      this.editor.on('CLOSED/gui_events', () => this.regenButton());
+      if (this.editor.GUIavailable) this.setupAllGUI();
+      else this.editor.on('GUI_LOADED', () => this.setupAllGUI());
+    });
   }
 
   // Button stuff
   regenButton() {
+    if (this._menubutton) try { this._menubutton.remove() } catch {};
     this._menubutton = this.makeButton;
     this._menubutton.show();
   }
@@ -397,10 +429,18 @@ class GUI extends EventEmitter {
     this.show();
   }
 
+  // GUI
+  constructGUI() {
+  }
+
   show() {
+    this._modal.innerHTML = '';
+    this.constructGUI();
     this._modal.showModal();
   }
+
   hide() {
+    this._modal.innerHTML = '';
     this._modal.hide();
   }
 }
