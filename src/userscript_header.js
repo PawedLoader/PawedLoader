@@ -5,6 +5,7 @@
 // @description  W.I.P
 // @author       Ashimee
 // @match        *://turbowarp.org/*
+// @match        *://staging.turbowarp.org/*
 // @match        *://packager.turbowarp.org/
 // @icon         https://www.google.com/s2/favicons?domain=packager.turbowarp.org
 // @run-at       document-end

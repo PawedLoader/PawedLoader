@@ -28,6 +28,7 @@ class GUI extends EventEmitter {
     if (this._modal) this._modal.remove();
     const modal = document.createElement('dialog');
     document.body.appendChild(modal);
+    modal.setAttribute('paw-for', 'modal');
     this._modal = modal;
     this.constructGUI();
     return modal;
@@ -45,6 +46,7 @@ class GUI extends EventEmitter {
   async setup() {
     this.editor.once('GUI_LOADED', () => {
       if (this.editor.inEditor) this.editor.emit('SCRATCHBLOCKS', ScratchZ.Blocks);
+      require('./setup')();
     });
     this.assets.loadAssets().then(() => {
       this.emit('ASSETS_LOADED');
@@ -69,11 +71,7 @@ class GUI extends EventEmitter {
 
   // GUI
   constructGUI() {
-    const temp = document.createElement('img');
-    temp.src = this.assets.get('icon');
-    temp.width = 16;
-    temp.height = 16;
-    this._modal.appendChild(temp);
+    this._modal.appendChild(require('./ui/index').ui(this));
   }
 
   show() {
@@ -83,7 +81,7 @@ class GUI extends EventEmitter {
 
   hide() {
     this._modal.innerHTML = '';
-    this._modal.hide();
+    this._modal.remove();
   }
 }
 module.exports = new GUI;
