@@ -13,6 +13,9 @@ class GUI extends EventEmitter {
     this.editor = require('./editor');
     this.addons = require('./addons/manager');
     this.assets = require('./ui/assets');
+    // Style sheet
+    this.styles = document.createElement('style');
+    this.styles.css = require('./ui/css');
     // Making the ui componnents
     this._modal = null;
     this._menubutton = this.makeButton;
@@ -29,6 +32,8 @@ class GUI extends EventEmitter {
     const modal = document.createElement('dialog');
     document.body.appendChild(modal);
     modal.setAttribute('paw-for', 'modal');
+    this.styles.textContent = this.styles.css.get();
+    modal.appendChild(this.styles);
     this._modal = modal;
     this.constructGUI();
     return modal;
