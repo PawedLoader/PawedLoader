@@ -2,7 +2,8 @@
 // @name         PawedLoader
 // @namespace    https://google.com/
 // @version      0.0.1a
-// @updateURL    https://pawedloader.github.io/PawedLoader/$release.js
+// @downloadURL  https://pawedloader.github.io/PawedLoader/$release.js
+// @updateURL    https://pawedloader.github.io/PawedLoader/src/$release.ver
 // @description  W.I.P
 // @author       Ashimee
 // @match        *://turbowarp.org/*

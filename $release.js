@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         PawedLoader
 // @namespace    https://google.com/
-// @version      0.0.1
-// @updateURL    https://pawedloader.github.io/PawedLoader/$release.js
+// @version      0.0.1a
+// @downloadURL  https://pawedloader.github.io/PawedLoader/$release.js
+// @updateURL    https://pawedloader.github.io/PawedLoader/src/$release.ver
 // @description  W.I.P
 // @author       Ashimee
 // @match        *://turbowarp.org/*
@@ -14,7 +15,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714778526875 */
+/* Last build: 1714778722668 */
 (async function() {
   /******/ (() => { // webpackBootstrap
   /******/ 	var __webpack_modules__ = ({
