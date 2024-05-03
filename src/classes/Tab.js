@@ -3,7 +3,9 @@ module.exports = class Tab {
     this.body = body;
     this.node = null;
   }
+  constructNode() {} // The user will override this
   get getNode() {
+    this.constructNode();
     return this.node;
   }
 }

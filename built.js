@@ -13,7 +13,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714771238744 */
+/* Last build: 1714773005066 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -665,7 +665,9 @@ module.exports = class Tab {
     this.body = body;
     this.node = null;
   }
+  constructNode() {} // The user will override this
   get getNode() {
+    this.constructNode();
     return this.node;
   }
 }
@@ -1049,7 +1051,7 @@ class UITabs extends StateNode {
     this.register('TAB_CHANGED');
     this.tabNumber = body.tabNumber;
     this.tabPath = body.tabPath;
-    this.tabs = {'Extensions': ['Merged', 'Unmerged', 'Gallery'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
+    this.tabs = {'Extensions': ['Merged', 'Unmerged', 'Gallery'], 'N-A~1': ['Packager', 'Addons', 'Themes', 'Credits']};
   }
   tabClicked(tab, event) {
     this.tabNumber = Number(tab.getAttribute('paw-tabNumber'));
@@ -1078,7 +1080,7 @@ class UITabs extends StateNode {
       }
       const sectWrapper = document.createElement('div');
       sectWrapper.setAttribute('paw-for', 'tab-sect-pop');
-      if (!entry[0].startsWith('N/A')) sectWrapper.appendChild(sectName);
+      if (!entry[0].startsWith('N-A')) sectWrapper.appendChild(sectName);
       sectWrapper.appendChild(sectBody);
       sect.appendChild(sectWrapper);
     }
@@ -1102,7 +1104,7 @@ class UIBody extends StateNode {
   get getTab() {
     const tabWrapper = document.createElement('div');
     const allTabs = (__webpack_require__(/*! ./tabs */ "./src/ui/tabs.js").tabs);
-    const tabClass = allTabs[this.tabPath] ?? (__webpack_require__(/*! ./tabs */ "./src/ui/tabs.js").tabs)['N/A'];
+    const tabClass = allTabs[this.tabPath] ?? (__webpack_require__(/*! ./tabs */ "./src/ui/tabs.js").tabs)['N-A'];
     const tab = new tabClass(this);
     tabWrapper.appendChild(tab.getNode);
     tabWrapper.setAttribute('paw-for', 'tab-render');
@@ -1156,6 +1158,64 @@ module.exports = class MyTab extends Tab {
     super(body);
     this.node = document.createElement('span');
     this.node.textContent = `[TAB NOT IMPLEMENTED] ${body.tabNumber} : ${body.tabPath}`;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/ui/tab/Credits.js":
+/*!*******************************!*\
+  !*** ./src/ui/tab/Credits.js ***!
+  \*******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Tab = __webpack_require__(/*! ../../classes/Tab */ "./src/classes/Tab.js");
+module.exports = class MyTab extends Tab {
+  constructor(body) {
+    super(body);
+    this.node = document.createElement('span');
+    this.node.textContent = `${body.tabNumber} : ${body.tabPath}`;
+    // Please keep this list in alphabetical order please.
+    this.credits = [{
+      name: 'Ashime',
+      link: 'https://github.com/Ashimee/',
+      did: `[EMPTY]`,
+      role: '[EMPTY]',
+    }, {
+      name: 'DragoCuven',
+      link: 'https://scratch.mit.edu/MARTINELPLAYZ/',
+      did: `[EMPTY]`,
+      role: '[EMPTY]',
+    },/* {
+      name: 'ObviousAlexC',
+      link: 'https://github.com/ObviousAlexC/',
+      did: `N/A`,
+      role: 'N/A', // this would be gui
+    }, {
+      name: 'SharkPool',
+      link: 'https://www.youtube.com/@SharkPool_SP/',
+      did: `N/A`,
+      role: 'N/A', // if he helped this would be "Stylist"
+    },*/];
+  }
+  constructNode() {
+    this.node.innerHTML = '';
+    const tabTitle = document.createElement('h3');
+    tabTitle.textContent = 'CREDITS';
+    tabTitle.setAttribute('paw-for', 'credits-title');
+    const creditsHolder = document.createElement('div');
+    creditsHolder.setAttribute('paw-for', 'credits-holder');
+    for (const user of this.credits) {
+      const userNode = document.createElement('div');
+      userNode.setAttribute('paw-for', 'credits-user');
+      const username = document.createElement('a');
+      username.textContent = user.name;
+      username.href = user.link;
+      userNode.appendChild(username);
+      creditsHolder.appendChild(userNode);
+    }
+    this.node.appendChild(tabTitle);
+    this.node.appendChild(creditsHolder);
   }
 }
 
@@ -1299,9 +1359,10 @@ module.exports = class MyTab extends Tab {
 
 module.exports = {
   tabs: {
-    'N/A': __webpack_require__(/*! ./tab/$Placeholder */ "./src/ui/tab/$Placeholder.js"),
+    'N-A': __webpack_require__(/*! ./tab/$Placeholder */ "./src/ui/tab/$Placeholder.js"),
     'Extensions/Merged': __webpack_require__(/*! ./tab/Extensions_Merged */ "./src/ui/tab/Extensions_Merged.js"),
     'Extensions/Gallery': __webpack_require__(/*! ./tab/Extensions_Gallery */ "./src/ui/tab/Extensions_Gallery.js"),
+    'N-A~1/Credits': __webpack_require__(/*! ./tab/Credits */ "./src/ui/tab/Credits.js"),
   }
 }
 

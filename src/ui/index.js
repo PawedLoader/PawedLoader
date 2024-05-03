@@ -33,7 +33,7 @@ class UITabs extends StateNode {
     this.register('TAB_CHANGED');
     this.tabNumber = body.tabNumber;
     this.tabPath = body.tabPath;
-    this.tabs = {'Extensions': ['Merged', 'Unmerged', 'Gallery'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
+    this.tabs = {'Extensions': ['Merged', 'Unmerged', 'Gallery'], 'N-A~1': ['Packager', 'Addons', 'Themes', 'Credits']};
   }
   tabClicked(tab, event) {
     this.tabNumber = Number(tab.getAttribute('paw-tabNumber'));
@@ -62,7 +62,7 @@ class UITabs extends StateNode {
       }
       const sectWrapper = document.createElement('div');
       sectWrapper.setAttribute('paw-for', 'tab-sect-pop');
-      if (!entry[0].startsWith('N/A')) sectWrapper.appendChild(sectName);
+      if (!entry[0].startsWith('N-A')) sectWrapper.appendChild(sectName);
       sectWrapper.appendChild(sectBody);
       sect.appendChild(sectWrapper);
     }
@@ -86,7 +86,7 @@ class UIBody extends StateNode {
   get getTab() {
     const tabWrapper = document.createElement('div');
     const allTabs = require('./tabs').tabs;
-    const tabClass = allTabs[this.tabPath] ?? require('./tabs').tabs['N/A'];
+    const tabClass = allTabs[this.tabPath] ?? require('./tabs').tabs['N-A'];
     const tab = new tabClass(this);
     tabWrapper.appendChild(tab.getNode);
     tabWrapper.setAttribute('paw-for', 'tab-render');
