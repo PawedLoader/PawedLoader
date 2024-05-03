@@ -13,6 +13,7 @@ class GUI extends EventEmitter {
     this.editor = require('./editor');
     this.addons = require('./addons/manager');
     this.assets = require('./ui/assets');
+    this.DB = require('./db');
     // Style sheet
     this.styles = document.createElement('style');
     this.styles.css = require('./ui/css');

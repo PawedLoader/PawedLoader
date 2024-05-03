@@ -13,7 +13,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714753397228 */
+/* Last build: 1714767009344 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -377,6 +377,100 @@ module.exports = class GZip {
 
 /***/ }),
 
+/***/ "./src/classes/IndexedDBSimple.js":
+/*!****************************************!*\
+  !*** ./src/classes/IndexedDBSimple.js ***!
+  \****************************************/
+/***/ ((module) => {
+
+// https://web.archive.org/web/20240503173045/https://raw.githubusercontent.com/Mistium/extensions.mistium/main/featured/IndexedDB.js
+// License was not provided in that version,
+// Intern im making it MIT for this project.
+module.exports = class IndexedDBsimple {
+  constructor() {
+    this.dbName = 'PawedLoader';
+    this.dbVersion = 1;
+    this.db;
+  }
+
+  setDBName(NAME) {
+    this.dbName = NAME;
+    this.initializeDatabase();
+  }
+
+  initializeDatabase() {
+    const request = indexedDB.open(this.dbName, this.dbVersion);
+
+    request.onerror = function(event) {
+      console.error('IndexedDB error:', event.target.error);
+    };
+
+    request.onsuccess = (event) => {
+      this.db = event.target.result;
+    };
+
+    request.onupgradeneeded = (event) => {
+      this.db = event.target.result;
+      const objectStore = this.db.createObjectStore('data', {
+        keyPath: 'key'
+      });
+    };
+  }
+
+  writeToDatabase(KEY, VALUE) {
+    const transaction = this.db.transaction(['data'], 'readwrite');
+    const objectStore = transaction.objectStore('data');
+    objectStore.put({
+      key: KEY,
+      value: VALUE
+    });
+  }
+
+  async readFromDatabase(KEY) {
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction(['data'], 'readonly');
+      const objectStore = transaction.objectStore('data');
+      const request = objectStore.get(KEY);
+      request.onsuccess = function(event) {
+        resolve(event.target.result ? event.target.result.value : null);
+      };
+      request.onerror = function(event) {
+        reject('Error reading from database');
+      };
+    });
+  }
+
+  async getAllKeys() {
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction(['data'], 'readonly');
+      const objectStore = transaction.objectStore('data');
+      const request = objectStore.getAllKeys();
+      request.onsuccess = function(event) {
+        const keysArray = event.target.result;
+        const keysJSON = JSON.stringify(keysArray);
+        resolve(keysJSON);
+      };
+      request.onerror = function(event) {
+        reject('Error getting keys from database');
+      };
+    });
+  }
+
+
+  async keyExists(KEY) {
+    const keys = await this.getAllKeys();
+    return keys.includes(KEY);
+  }
+
+  deleteFromDatabase(KEY) {
+    const transaction = this.db.transaction(['data'], 'readwrite');
+    const objectStore = transaction.objectStore('data');
+    objectStore.delete(KEY);
+  }
+}
+
+/***/ }),
+
 /***/ "./src/classes/MenuBarButton.js":
 /*!**************************************!*\
   !*** ./src/classes/MenuBarButton.js ***!
@@ -483,6 +577,19 @@ module.exports = class Tab {
     return this.node;
   }
 }
+
+/***/ }),
+
+/***/ "./src/db.js":
+/*!*******************!*\
+  !*** ./src/db.js ***!
+  \*******************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const IndexedDBsimple = __webpack_require__(/*! ./classes/IndexedDBSimple */ "./src/classes/IndexedDBSimple.js");
+const DB = new IndexedDBsimple();
+DB.setDBName('PawedLoader');
+module.exports = DB;
 
 /***/ }),
 
@@ -593,6 +700,7 @@ class GUI extends EventEmitter {
     this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
     this.addons = __webpack_require__(/*! ./addons/manager */ "./src/addons/manager.js");
     this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");
+    this.DB = __webpack_require__(/*! ./db */ "./src/db.js");
     // Style sheet
     this.styles = document.createElement('style');
     this.styles.css = __webpack_require__(/*! ./ui/css */ "./src/ui/css.js");
@@ -848,7 +956,7 @@ class UITabs extends StateNode {
     this.register('TAB_CHANGED');
     this.tabNumber = body.tabNumber;
     this.tabPath = body.tabPath;
-    this.tabs = {'Extensions': ['Merged', 'Unmerged'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
+    this.tabs = {'Extensions': ['Merged', 'Unmerged', 'Gallery'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
   }
   tabClicked(tab, event) {
     this.tabNumber = Number(tab.getAttribute('paw-tabNumber'));
@@ -957,6 +1065,155 @@ module.exports = class MyTab extends Tab {
 
 /***/ }),
 
+/***/ "./src/ui/tab/Extensions_Gallery.js":
+/*!******************************************!*\
+  !*** ./src/ui/tab/Extensions_Gallery.js ***!
+  \******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Tab = __webpack_require__(/*! ../../classes/Tab */ "./src/classes/Tab.js");
+const DB = __webpack_require__(/*! ../../db */ "./src/db.js");
+
+module.exports = class MyTab extends Tab {
+  constructor(body) {
+    super(body);
+    this.node = document.createElement('span');
+    this.node.textContent = `${body.tabNumber} : ${body.tabPath}`;
+    this._refreshingGallerys = false;
+    this.gallerys = document.createElement('div');
+    this.galleryURLS = {
+      'ashime': 'https://surv.is-a.dev/survs-gallery/',
+      'sharkpool': 'https://sharkpool-sp.github.io/SharkPools-Extensions/Gallery%20Files/Extension-Keys.json',
+    }
+  }
+  async constructNode() {
+    const refreshButton = document.createElement('button');
+    refreshButton.textContent = 'Refresh Gallerys';
+    refreshButton.onclick = async (event) => {
+      this._refreshingGallerys = true;
+      await this._makeGallerys();
+    }
+    this.node.innerHTML = '';
+    this.node.appendChild(refreshButton);
+    await this._makeGallerys();
+  }
+  async _makeGallerys() {
+    if (this.gallerys) this.gallerys.remove();
+    this.gallerys = document.createElement('div');
+    let skipConstruct = false;
+    if (await DB.readFromDatabase('gallerysJSON') === null) {
+      this.gallerys.innerHTML = '';
+      this.gallerys.appendChild(document.createTextNode('Refresh the gallerys as they have not yet been loaded in!'));
+      skipConstruct = true;
+    }
+    for (const galleryName of Object.keys(this.galleryURLS)) {
+      if (this._refreshingGallerys) {
+        await this._refreshGallery(galleryName);
+      }
+      if (!skipConstruct) this.gallerys.appendChild(await this._constructGallery(galleryName));
+    }
+    this._refreshingGallerys = false;
+    try {
+      this.gallerys.remove();
+    } catch {} finally {
+      this.node.appendChild(this.gallerys);
+    }
+  }
+  async _constructGallery(galleryName) {
+    const gallery = JSON.parse(await DB.readFromDatabase('gallerysJSON'))[galleryName];
+    const node = document.createElement('div');
+    node.setAttribute('paw-for', 'ext-gallery-wrapper-outer');
+    const header = document.createElement('h3');
+    const galleryWrapper = document.createElement('div');
+    galleryWrapper.setAttribute('paw-for', 'ext-gallery-wrapper-inner');
+    header.textContent = `${galleryName.toLowerCase()}'s Gallery`;
+    header.setAttribute('paw-for', 'ext-gallery-title');
+    node.appendChild(header);
+    let data, hostReplacer = `${document.location.protocol}//${document.location.host}`;
+    switch(galleryName) {
+      case 'sharkpool':
+        data = JSON.parse(gallery)['extensions'];
+        Object.entries(data).forEach(([extensionID, extensionData]) => {
+          if (extensionID === 'Example') return;
+          galleryWrapper.appendChild(this._makeExtension({
+            title: extensionID,
+            url: extensionData.url,
+            description: this._cleanExtensionDescription(extensionData.credits),
+            credits: [],
+            imageURL: `https://sharkpool-sp.github.io/SharkPools-Extensions/extension-thumbs/${extensionID}.svg`,
+          }));
+        });
+        break;
+      case 'ashime':
+        data = new DOMParser().parseFromString(gallery, 'text/html');
+        ((function() {
+          const extensions = Array.from(data.querySelectorAll('.extension')).filter(ext => (ext.style.display ?? '') !== 'none');
+          return extensions.map(extension => {
+            return {
+              title: extension.querySelector('h3').textContent,
+              description: extension.querySelector('p').textContent,
+              imageURL: 'https://surv.is-a.dev/survs-gallery'+extension.querySelector('img[class*="extension-image"]').src.replace(hostReplacer, ''),
+              url: 'https://surv.is-a.dev/survs-gallery'+extension.querySelector('button').dataset.url.replace(hostReplacer, ''),
+              credits: (Array.from((extension.querySelector('div[class*="credit-box"] > div[class*="extension-boxing-inner"]') ?? document.createElement('div')).querySelectorAll('a')).map(user => ({url: user.href, name: user.textContent})))
+            }
+          });
+        })()).forEach(extension => {
+          galleryWrapper.appendChild(this._makeExtension(extension));
+        });
+        break;
+    }
+    node.appendChild(galleryWrapper);
+    return node;
+  }
+  async _refreshGallery(galleryName) {
+    const api = this.galleryURLS[galleryName];
+    await (new Promise(async (resolve, reject) => {
+      fetch(api).then(async (value) => {
+        const data = await value.text();
+        const currentJSON = JSON.parse(await DB.readFromDatabase('gallerysJSON') ?? '{}');
+        currentJSON[galleryName] = data;
+        await DB.writeToDatabase('gallerysJSON', JSON.stringify(currentJSON));
+        resolve(data);
+      }).catch((reason) => reject(reason));
+    }));
+  }
+  _makeExtension(extension) {
+    const node = document.createElement('div');
+    node.setAttribute('paw-for', 'extension');
+    const imageWrapper = document.createElement('div');
+    const image = document.createElement('img');
+    image.src = extension.imageURL;
+    image.alt = `Thumbnail for "${extension.title}".`;
+    imageWrapper.appendChild(image);
+    imageWrapper.setAttribute('paw-for', 'extension-thumbnail');
+    const title = document.createElement('h5');
+    title.textContent = extension.title;
+    title.setAttribute('paw-for', 'extension-title');
+    const credits = document.createElement('div');
+    credits.setAttribute('paw-for', 'extension-credits-outer');
+    const descriptionWrapper = document.createElement('div');
+    const description = document.createElement('p');
+    description.textContent = extension.description;
+    descriptionWrapper.appendChild(description);
+    credits.setAttribute('paw-for', 'extension-description');
+    node.appendChild(imageWrapper);
+    node.appendChild(title);
+    node.appendChild(descriptionWrapper);
+    node.appendChild(credits);
+    return node;
+  }
+  _cleanExtensionDescription(description) {
+    return description;
+  }
+  get getNode() {
+    this.node.innerHTML = '';
+    this.constructNode(); // Should append the gallerys after :thinking:
+    return this.node;
+  }
+}
+
+/***/ }),
+
 /***/ "./src/ui/tab/Extensions_Merged.js":
 /*!*****************************************!*\
   !*** ./src/ui/tab/Extensions_Merged.js ***!
@@ -984,6 +1241,7 @@ module.exports = {
   tabs: {
     'N/A': __webpack_require__(/*! ./tab/$Placeholder */ "./src/ui/tab/$Placeholder.js"),
     'Extensions/Merged': __webpack_require__(/*! ./tab/Extensions_Merged */ "./src/ui/tab/Extensions_Merged.js"),
+    'Extensions/Gallery': __webpack_require__(/*! ./tab/Extensions_Gallery */ "./src/ui/tab/Extensions_Gallery.js"),
   }
 }
 
@@ -1226,28 +1484,29 @@ var __webpack_exports__ = {};
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
-const vm = (__webpack_require__(/*! ./defs */ "./src/defs.js").vm);
-const GUI = __webpack_require__(/*! ./gui */ "./src/gui.js");
+setTimeout(() => {
+  const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
+  const vm = (__webpack_require__(/*! ./defs */ "./src/defs.js").vm);
+  const GUI = __webpack_require__(/*! ./gui */ "./src/gui.js");
 
-// Exposing Scratch.gui.getBlockly patch.
-GUI.constructor.prototype._patchScratchGUI = __webpack_require__(/*! ./patches/Scratch_gui_getBlockly */ "./src/patches/Scratch_gui_getBlockly.js");
+  // Exposing Scratch.gui.getBlockly patch.
+  GUI.constructor.prototype._patchScratchGUI = __webpack_require__(/*! ./patches/Scratch_gui_getBlockly */ "./src/patches/Scratch_gui_getBlockly.js");
 
-GUI.setup();
-GUI.addons.load();
-minilog.log('Loaded.');
+  GUI.setup();
+  GUI.addons.load();
+  minilog.log('Loaded.');
 
-vm.paw = GUI;
-vm.paw._loadRequire = () => {
-  if (vm.paw.require) return vm.paw.require;
-  try {
-    vm.paw.require = __webpack_require__;
-    return vm.paw.require;
-  } catch {
-    console.error('Failed to expose __webpack_require_');
+  vm.paw = GUI;
+  vm.paw._loadRequire = () => {
+    if (vm.paw.require) return vm.paw.require;
+    try {
+      vm.paw.require = __webpack_require__;
+      return vm.paw.require;
+    } catch {
+      console.error('Failed to expose __webpack_require_');
+    };
   };
-};
-
+}, 2500);
 })();
 
 /******/ })()

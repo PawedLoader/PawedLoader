@@ -33,7 +33,7 @@ class UITabs extends StateNode {
     this.register('TAB_CHANGED');
     this.tabNumber = body.tabNumber;
     this.tabPath = body.tabPath;
-    this.tabs = {'Extensions': ['Merged', 'Unmerged'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
+    this.tabs = {'Extensions': ['Merged', 'Unmerged', 'Gallery'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
   }
   tabClicked(tab, event) {
     this.tabNumber = Number(tab.getAttribute('paw-tabNumber'));
