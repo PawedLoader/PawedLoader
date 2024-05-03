@@ -2,6 +2,7 @@
 // @name         PawedLoader
 // @namespace    https://google.com/
 // @version      0.0.1
+// @updateURL    https://pawedloader.github.io/PawedLoader/$release.js
 // @description  W.I.P
 // @author       Ashimee
 // @match        *://turbowarp.org/*
@@ -13,7 +14,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714773005066 */
+/* Last build: 1714778324738 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -1169,33 +1170,29 @@ module.exports = class MyTab extends Tab {
   \*******************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+const hasOwn = (__webpack_require__(/*! ../../utils/index */ "./src/utils/index.js").hasOwn);
 const Tab = __webpack_require__(/*! ../../classes/Tab */ "./src/classes/Tab.js");
+
 module.exports = class MyTab extends Tab {
   constructor(body) {
     super(body);
     this.node = document.createElement('span');
     this.node.textContent = `${body.tabNumber} : ${body.tabPath}`;
     // Please keep this list in alphabetical order please.
+    // Contenplating if I should keep role and did shit or not.
     this.credits = [{
       name: 'Ashime',
       link: 'https://github.com/Ashimee/',
-      did: `[EMPTY]`,
-      role: '[EMPTY]',
+      secret: 'Made all the internals bub.',
     }, {
-      name: 'DragoCuven',
-      link: 'https://scratch.mit.edu/MARTINELPLAYZ/',
-      did: `[EMPTY]`,
-      role: '[EMPTY]',
+      name: 'Drago-Cuven',
+      link: 'https://github.com/Drago-Cuven/',
     },/* {
       name: 'ObviousAlexC',
       link: 'https://github.com/ObviousAlexC/',
-      did: `N/A`,
-      role: 'N/A', // this would be gui
     }, {
       name: 'SharkPool',
       link: 'https://www.youtube.com/@SharkPool_SP/',
-      did: `N/A`,
-      role: 'N/A', // if he helped this would be "Stylist"
     },*/];
   }
   constructNode() {
@@ -1212,6 +1209,7 @@ module.exports = class MyTab extends Tab {
       username.textContent = user.name;
       username.href = user.link;
       userNode.appendChild(username);
+      if (hasOwn(user, 'secret')) userNode.alt = user.secret;
       creditsHolder.appendChild(userNode);
     }
     this.node.appendChild(tabTitle);
