@@ -19,6 +19,7 @@ class Editor extends EventEmitter {
       if (this._wasInEditor !== this.inEditor) {
         if (this._wasInEditor) this.emit('CLOSED');
         else this.emit('OPENED');
+        this._wasInEditor = this.inEditor;
       }
     });
     if (this._wasInEditor) setTimeout(() => {
@@ -27,8 +28,8 @@ class Editor extends EventEmitter {
     this.on('OPENED', (guiDelay) => {
       setTimeout(() => this.emit('OPENED/gui_events'), guiDelay ?? 500);
     });
-    this.on('CLOSED', () => {
-      setTimeout(() => this.emit('CLOSED/gui_events'), 500);
+    this.on('CLOSED', (guiDelay) => {
+      setTimeout(() => this.emit('CLOSED/gui_events'), guiDelay ?? 500);
     });
   }
   get GUIavailable() {

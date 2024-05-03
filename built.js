@@ -13,7 +13,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714752186598 */
+/* Last build: 1714753397228 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -383,8 +383,13 @@ module.exports = class GZip {
   \**************************************/
 /***/ ((module) => {
 
-const fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
-const buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+let fileGroupBar, buttonHoverClasses;
+
+function refreshNodes() {
+  fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
+  buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+}
+refreshNodes();
 
 /**
  * Makes a button
@@ -397,6 +402,7 @@ class MenuBarButton {
    * @param {Boolean} isDropdown Weather or not this has a dropdown attached to it
    */
   constructor(html, image, isDropdown) {
+    refreshNodes();
     const newButton = document.querySelector('div[class^=menu-bar_menu-bar-item]').cloneNode(true);
     this.node = newButton;
     this.isDropdown = isDropdown ?? false;
@@ -535,6 +541,7 @@ class Editor extends EventEmitter {
       if (this._wasInEditor !== this.inEditor) {
         if (this._wasInEditor) this.emit('CLOSED');
         else this.emit('OPENED');
+        this._wasInEditor = this.inEditor;
       }
     });
     if (this._wasInEditor) setTimeout(() => {
@@ -543,8 +550,8 @@ class Editor extends EventEmitter {
     this.on('OPENED', (guiDelay) => {
       setTimeout(() => this.emit('OPENED/gui_events'), guiDelay ?? 500);
     });
-    this.on('CLOSED', () => {
-      setTimeout(() => this.emit('CLOSED/gui_events'), 500);
+    this.on('CLOSED', (guiDelay) => {
+      setTimeout(() => this.emit('CLOSED/gui_events'), guiDelay ?? 500);
     });
   }
   get GUIavailable() {

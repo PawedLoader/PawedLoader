@@ -1,5 +1,10 @@
-const fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
-const buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+let fileGroupBar, buttonHoverClasses;
+
+function refreshNodes() {
+  fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
+  buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+}
+refreshNodes();
 
 /**
  * Makes a button
@@ -12,6 +17,7 @@ class MenuBarButton {
    * @param {Boolean} isDropdown Weather or not this has a dropdown attached to it
    */
   constructor(html, image, isDropdown) {
+    refreshNodes();
     const newButton = document.querySelector('div[class^=menu-bar_menu-bar-item]').cloneNode(true);
     this.node = newButton;
     this.isDropdown = isDropdown ?? false;
