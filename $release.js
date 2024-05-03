@@ -14,7 +14,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714778324738 */
+/* Last build: 1714778526875 */
 (async function() {
   /******/ (() => { // webpackBootstrap
   /******/ 	var __webpack_modules__ = ({
