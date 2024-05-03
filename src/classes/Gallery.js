@@ -58,6 +58,7 @@ module.exports = class Gallery extends Tab {
     header.textContent = `${this.galleryName.toLowerCase()}'s Gallery`;
     header.setAttribute('paw-for', 'ext-gallery-title');
     node.appendChild(header);
+    node.appendChild(galleryWrapper);
     this.node.appendChild(node);
   }
   async constructNode() {} // For the user to override.

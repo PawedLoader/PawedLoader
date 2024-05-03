@@ -13,7 +13,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714770695016 */
+/* Last build: 1714771238744 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -443,6 +443,7 @@ module.exports = class Gallery extends Tab {
     header.textContent = `${this.galleryName.toLowerCase()}'s Gallery`;
     header.setAttribute('paw-for', 'ext-gallery-title');
     node.appendChild(header);
+    node.appendChild(galleryWrapper);
     this.node.appendChild(node);
   }
   async constructNode() {} // For the user to override.
@@ -1191,11 +1192,13 @@ module.exports = class MyTab extends Tab {
       await this._makeGallerys();
     }
     node.appendChild(refreshButton);
+    this.headerNode = node;
     return node;
   }
   _deleteGallery(overwrite) {
     try {
       this.gallerys.remove();
+      this.headerNode.remove();
     } catch {} finally {
       if (overwrite ?? false) this.gallerys = document.createElement('div');
     }

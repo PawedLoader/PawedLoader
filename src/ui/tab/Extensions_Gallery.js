@@ -23,11 +23,13 @@ module.exports = class MyTab extends Tab {
       await this._makeGallerys();
     }
     node.appendChild(refreshButton);
+    this.headerNode = node;
     return node;
   }
   _deleteGallery(overwrite) {
     try {
       this.gallerys.remove();
+      this.headerNode.remove();
     } catch {} finally {
       if (overwrite ?? false) this.gallerys = document.createElement('div');
     }
