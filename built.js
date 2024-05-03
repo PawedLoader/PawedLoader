@@ -13,7 +13,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714767009344 */
+/* Last build: 1714770695016 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -372,6 +372,97 @@ module.exports = class GZip {
       //return streamToBlob(bufferToStream(this.#dataView.buffer).pipeThrough(new DecompressionStream("gzip")));
       //Otherwise slice where the data starts to the last 8 bytes
       return streamToBlob(bufferToStream(this.#dataView.buffer.slice(this.#index, this.#dataView.byteLength - 8)).pipeThrough(new DecompressionStream("deflate-raw")));
+  }
+}
+
+/***/ }),
+
+/***/ "./src/classes/Gallery.js":
+/*!********************************!*\
+  !*** ./src/classes/Gallery.js ***!
+  \********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Tab = __webpack_require__(/*! ./Tab */ "./src/classes/Tab.js");
+
+module.exports = class Gallery extends Tab {
+  constructor(body, galleryName) {
+    super(body);
+    this.body = body;
+    this.galleryName = galleryName;
+    this.extensions = [];
+    this._tempExtensions = [];
+    this.node = document.createElement('span');
+    this.node.textContent = 'Constructing gallery, please be patient.';
+    this._refreshingGallery = false;
+  }
+  _cleanExtensionDescription(description) {
+    return description;
+  }
+  _makeExtension(extension) {
+    const node = document.createElement('div');
+    node.setAttribute('paw-for', 'extension');
+    const imageWrapper = document.createElement('div');
+    const image = document.createElement('img');
+    image.src = extension.imageURL;
+    image.alt = `Thumbnail for "${extension.title}".`;
+    imageWrapper.appendChild(image);
+    imageWrapper.setAttribute('paw-for', 'extension-thumbnail');
+    const title = document.createElement('h5');
+    title.textContent = extension.title;
+    title.setAttribute('paw-for', 'extension-title');
+    const credits = document.createElement('div');
+    credits.setAttribute('paw-for', 'extension-credits-outer');
+    const descriptionWrapper = document.createElement('div');
+    const description = document.createElement('p');
+    description.textContent = extension.description;
+    descriptionWrapper.appendChild(description);
+    credits.setAttribute('paw-for', 'extension-description');
+    node.appendChild(imageWrapper);
+    node.appendChild(title);
+    node.appendChild(descriptionWrapper);
+    node.appendChild(credits);
+    return node;
+  }
+  addExtension(extension) {
+    extension.description = this._cleanExtensionDescription(extension.description);
+    this.extensions.push(extension)
+  }
+  addExtensions(extensions) {
+    extensions.forEach(extension => this.addExtension(extension));
+  }
+  async makeGallery() {
+    const node = document.createElement('div');
+    node.setAttribute('paw-for', 'ext-gallery-wrapper-outer');
+    const header = document.createElement('h3');
+    const galleryWrapper = document.createElement('div');
+    galleryWrapper.setAttribute('paw-for', 'ext-gallery-wrapper-inner');
+    this.extensions.forEach(extension => {
+      galleryWrapper.appendChild(this._makeExtension(extension));
+    });
+    header.textContent = `${this.galleryName.toLowerCase()}'s Gallery`;
+    header.setAttribute('paw-for', 'ext-gallery-title');
+    node.appendChild(header);
+    this.node.appendChild(node);
+  }
+  async constructNode() {} // For the user to override.
+  async constructGalleryNode() {
+    const refreshButton = document.createElement('button');
+    refreshButton.textContent = 'Refresh this gallery';
+    refreshButton.onclick = async (event) => {
+      this._refreshingGallery = true;
+      await this.makeGallery();
+    }
+    if (this.disableRefresh) refreshButton.style.display = 'none';
+    this.node.innerHTML = '';
+    this.node.appendChild(refreshButton);
+    await this.makeGallery();
+  }
+  get getNode() {
+    this.node.innerHTML = '';
+    this.constructGalleryNode(); // Should append the gallerys after :thinking:
+    this.constructNode();
+    return this.node;
   }
 }
 
@@ -764,7 +855,8 @@ class GUI extends EventEmitter {
 
   // GUI
   constructGUI() {
-    this._modal.appendChild((__webpack_require__(/*! ./ui/index */ "./src/ui/index.js").ui)(this));
+    this.UI = __webpack_require__(/*! ./ui/index */ "./src/ui/index.js");
+    this._modal.appendChild(this.UI.ui(this));
   }
 
   show() {
@@ -1034,8 +1126,11 @@ class UI extends StateNode {
   }
   ui(gui) {
     const header = new UIHeader(gui);
+    this.header = header;
     const body = new UIBody;
+    this.body = body;
     const footer = new UIFooter;
+    this.footer = footer;
     this.node.innerHTML = '';
     this.node.appendChild(header.node);
     this.node.appendChild(body.node);
@@ -1072,82 +1167,82 @@ module.exports = class MyTab extends Tab {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Tab = __webpack_require__(/*! ../../classes/Tab */ "./src/classes/Tab.js");
+const Gallery = __webpack_require__(/*! ../../classes/Gallery */ "./src/classes/Gallery.js");
 const DB = __webpack_require__(/*! ../../db */ "./src/db.js");
 
 module.exports = class MyTab extends Tab {
   constructor(body) {
     super(body);
     this.node = document.createElement('span');
-    this.node.textContent = `${body.tabNumber} : ${body.tabPath}`;
     this._refreshingGallerys = false;
-    this.gallerys = document.createElement('div');
+    this._deleteGallery(true);
     this.galleryURLS = {
       'ashime': 'https://surv.is-a.dev/survs-gallery/',
       'sharkpool': 'https://sharkpool-sp.github.io/SharkPools-Extensions/Gallery%20Files/Extension-Keys.json',
-    }
+    };
+    this.galleryMakers = {};
   }
-  async constructNode() {
+  get header() {
+    const node = document.createElement('div');
     const refreshButton = document.createElement('button');
-    refreshButton.textContent = 'Refresh Gallerys';
+    refreshButton.textContent = 'Refresh gallerys';
     refreshButton.onclick = async (event) => {
       this._refreshingGallerys = true;
       await this._makeGallerys();
     }
-    this.node.innerHTML = '';
-    this.node.appendChild(refreshButton);
-    await this._makeGallerys();
+    node.appendChild(refreshButton);
+    return node;
   }
-  async _makeGallerys() {
-    if (this.gallerys) this.gallerys.remove();
-    this.gallerys = document.createElement('div');
-    let skipConstruct = false;
-    if (await DB.readFromDatabase('gallerysJSON') === null) {
-      this.gallerys.innerHTML = '';
-      this.gallerys.appendChild(document.createTextNode('Refresh the gallerys as they have not yet been loaded in!'));
-      skipConstruct = true;
-    }
-    for (const galleryName of Object.keys(this.galleryURLS)) {
-      if (this._refreshingGallerys) {
-        await this._refreshGallery(galleryName);
-      }
-      if (!skipConstruct) this.gallerys.appendChild(await this._constructGallery(galleryName));
-    }
-    this._refreshingGallerys = false;
+  _deleteGallery(overwrite) {
     try {
       this.gallerys.remove();
     } catch {} finally {
-      this.node.appendChild(this.gallerys);
+      if (overwrite ?? false) this.gallerys = document.createElement('div');
     }
   }
-  async _constructGallery(galleryName) {
-    const gallery = JSON.parse(await DB.readFromDatabase('gallerysJSON'))[galleryName];
-    const node = document.createElement('div');
-    node.setAttribute('paw-for', 'ext-gallery-wrapper-outer');
-    const header = document.createElement('h3');
-    const galleryWrapper = document.createElement('div');
-    galleryWrapper.setAttribute('paw-for', 'ext-gallery-wrapper-inner');
-    header.textContent = `${galleryName.toLowerCase()}'s Gallery`;
-    header.setAttribute('paw-for', 'ext-gallery-title');
-    node.appendChild(header);
-    let data, hostReplacer = `${document.location.protocol}//${document.location.host}`;
+  async _makeGallerys() {
+    this._deleteGallery(true);
+    for (const galleryName of Object.keys(this.galleryURLS)) {
+      const gallery = await this._refreshGallery(galleryName, this._refreshingGallerys);
+      this.gallerys.appendChild(gallery.getNode);
+    }
+    this._refreshingGallerys = false;
+    this._deleteGallery(false);
+    this.node.appendChild(this.header);
+    this.node.appendChild(this.gallerys);
+  }
+  async _refreshGallery(galleryName, refetch) {
+    const api = this.galleryURLS[galleryName];
+    let galleryResponse = '';
+    if (refetch) await (new Promise(async (resolve, reject) => {
+      fetch(api).then(async (value) => {
+        galleryResponse = await value.text();
+        const currentJSON = JSON.parse(await DB.readFromDatabase('gallerysJSON') ?? '{}');
+        currentJSON[galleryName] = galleryResponse;
+        await DB.writeToDatabase('gallerysJSON', JSON.stringify(currentJSON));
+        resolve(galleryResponse);
+      }).catch((reason) => reject(reason));
+    }));
+    if (!galleryResponse) galleryResponse = JSON.parse(await DB.readFromDatabase('gallerysJSON'))[galleryName];
+    let galleryData, galleryExtensions,
+        hostReplacer = `${document.location.protocol}//${document.location.host}`;
     switch(galleryName) {
       case 'sharkpool':
-        data = JSON.parse(gallery)['extensions'];
-        Object.entries(data).forEach(([extensionID, extensionData]) => {
-          if (extensionID === 'Example') return;
-          galleryWrapper.appendChild(this._makeExtension({
+        galleryData = JSON.parse(galleryResponse)['extensions'];
+        galleryExtensions = Object.entries(galleryData).filter(([extensionID]) => (
+          extensionID !== 'Example'
+        )).map(([extensionID, extensionData]) => ({
             title: extensionID,
             url: extensionData.url,
-            description: this._cleanExtensionDescription(extensionData.credits),
+            description: extensionData.credits,
             credits: [],
             imageURL: `https://sharkpool-sp.github.io/SharkPools-Extensions/extension-thumbs/${extensionID}.svg`,
-          }));
-        });
+        }));
         break;
       case 'ashime':
-        data = new DOMParser().parseFromString(gallery, 'text/html');
-        ((function() {
-          const extensions = Array.from(data.querySelectorAll('.extension')).filter(ext => (ext.style.display ?? '') !== 'none');
+        galleryData = new DOMParser().parseFromString(galleryResponse, 'text/html');
+        galleryExtensions = ((function() {
+          const extensions = Array.from(galleryData.querySelectorAll('.extension')).filter(ext => (ext.style.display ?? '') !== 'none');
           return extensions.map(extension => {
             return {
               title: extension.querySelector('h3').textContent,
@@ -1157,57 +1252,19 @@ module.exports = class MyTab extends Tab {
               credits: (Array.from((extension.querySelector('div[class*="credit-box"] > div[class*="extension-boxing-inner"]') ?? document.createElement('div')).querySelectorAll('a')).map(user => ({url: user.href, name: user.textContent})))
             }
           });
-        })()).forEach(extension => {
-          galleryWrapper.appendChild(this._makeExtension(extension));
-        });
+        })());
         break;
     }
-    node.appendChild(galleryWrapper);
-    return node;
-  }
-  async _refreshGallery(galleryName) {
-    const api = this.galleryURLS[galleryName];
-    await (new Promise(async (resolve, reject) => {
-      fetch(api).then(async (value) => {
-        const data = await value.text();
-        const currentJSON = JSON.parse(await DB.readFromDatabase('gallerysJSON') ?? '{}');
-        currentJSON[galleryName] = data;
-        await DB.writeToDatabase('gallerysJSON', JSON.stringify(currentJSON));
-        resolve(data);
-      }).catch((reason) => reject(reason));
-    }));
-  }
-  _makeExtension(extension) {
-    const node = document.createElement('div');
-    node.setAttribute('paw-for', 'extension');
-    const imageWrapper = document.createElement('div');
-    const image = document.createElement('img');
-    image.src = extension.imageURL;
-    image.alt = `Thumbnail for "${extension.title}".`;
-    imageWrapper.appendChild(image);
-    imageWrapper.setAttribute('paw-for', 'extension-thumbnail');
-    const title = document.createElement('h5');
-    title.textContent = extension.title;
-    title.setAttribute('paw-for', 'extension-title');
-    const credits = document.createElement('div');
-    credits.setAttribute('paw-for', 'extension-credits-outer');
-    const descriptionWrapper = document.createElement('div');
-    const description = document.createElement('p');
-    description.textContent = extension.description;
-    descriptionWrapper.appendChild(description);
-    credits.setAttribute('paw-for', 'extension-description');
-    node.appendChild(imageWrapper);
-    node.appendChild(title);
-    node.appendChild(descriptionWrapper);
-    node.appendChild(credits);
-    return node;
-  }
-  _cleanExtensionDescription(description) {
-    return description;
+    const gallery = new Gallery(this.body, galleryName);
+    gallery.disableRefresh = true;
+    this.galleryMakers[galleryName] = gallery;
+    gallery.addExtensions(galleryExtensions);
+    return gallery;
   }
   get getNode() {
     this.node.innerHTML = '';
-    this.constructNode(); // Should append the gallerys after :thinking:
+    this._deleteGallery(false);
+    this._makeGallerys();
     return this.node;
   }
 }

@@ -77,7 +77,8 @@ class GUI extends EventEmitter {
 
   // GUI
   constructGUI() {
-    this._modal.appendChild(require('./ui/index').ui(this));
+    this.UI = require('./ui/index');
+    this._modal.appendChild(this.UI.ui(this));
   }
 
   show() {

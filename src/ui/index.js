@@ -111,8 +111,11 @@ class UI extends StateNode {
   }
   ui(gui) {
     const header = new UIHeader(gui);
+    this.header = header;
     const body = new UIBody;
+    this.body = body;
     const footer = new UIFooter;
+    this.footer = footer;
     this.node.innerHTML = '';
     this.node.appendChild(header.node);
     this.node.appendChild(body.node);
