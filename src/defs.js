@@ -1,6 +1,6 @@
 const ScratchZ = require('./utils/scratchz');
 
-const version = `0.0.1`;
+const version = `0.0.1a`;
 
 const ReduxStore = ScratchZ.ReduxStore, vm = ScratchZ.vm, runtime = vm.runtime;
 const onDesktopApp = document.location.href.includes('resources/app.asar');

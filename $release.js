@@ -15,7 +15,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714778722668 */
+/* Last build: 1714778807285 */
 (async function() {
   /******/ (() => { // webpackBootstrap
   /******/ 	var __webpack_modules__ = ({
@@ -697,7 +697,7 @@
   
   const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
   
-  const version = `0.0.1`;
+  const version = `0.0.1a`;
   
   const ReduxStore = ScratchZ.ReduxStore, vm = ScratchZ.vm, runtime = vm.runtime;
   const onDesktopApp = document.location.href.includes('resources/app.asar');
