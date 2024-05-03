@@ -5,14 +5,14 @@ const addonID = 'Ashimee';
 module.exports = (function(addonData) {
   
   function setup() {
-    
+    // damn
   }
   function main() {}
 
   return {
     name: 'Extension loading error catcher.', id: addonID,
     description: 'Catches errors when extensions load.',
-    lastupdate: '04/11/2024',
+    lastupdate: '04/30/2024',
     /* DO NOT CHANGE */
     setup, data: addonData
   }
