@@ -1,6 +1,10 @@
 const minilog = require('./utils/minilog');
 const vm = require('./defs').vm;
 const GUI = require('./gui');
+
+// Exposing Scratch.gui.getBlockly patch.
+GUI.constructor.prototype._patchScratchGUI = require('./patches/Scratch_gui_getBlockly');
+
 GUI.setup();
 GUI.addons.load();
 minilog.log('Loaded.');

@@ -13,7 +13,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714751054369 */
+/* Last build: 1714752186598 */
 (async function() {
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
@@ -667,6 +667,74 @@ module.exports = new GUI;
 
 /***/ }),
 
+/***/ "./src/patches/Scratch_gui_getBlockly.js":
+/*!***********************************************!*\
+  !*** ./src/patches/Scratch_gui_getBlockly.js ***!
+  \***********************************************/
+/***/ ((module) => {
+
+module.exports = function patch(Scratch) {
+  Scratch.gui = undefined;
+  delete Scratch.gui;
+  (function(Scratch) {
+    function getBlockly() {
+      return new Promise((resolve_getBlockly, reject_getBlockly) => {
+        // A single namespace as to not waste RAM with setTimeout loops
+        if (!vm?.$LazySB) vm.$LazySB = {
+          $dev: false,
+          onBlockly(callback) {
+            return new Promise((resolve_onBlockly, reject_onBlockly) => {
+              if (typeof window?.ScratchBlocks === 'object') resolve_onBlockly(window.ScratchBlocks);
+              function waitLoop() {
+                if (vm.$LazySB.$dev) console.log('wait loop');
+                if (typeof window?.ScratchBlocks !== 'object') {
+                  if (vm.$LazySB.$dev) console.log('looping again');
+                  setTimeout(() => waitLoop(), 10);
+                } else {
+                  if (vm.$LazySB.$dev) console.log('Found Blockly, resolving onBlockly');
+                  callback(window.ScratchBlocks);
+                  resolve_onBlockly(window.ScratchBlocks);
+                }
+              }
+              setTimeout(() => waitLoop(), 10);
+            });
+          },
+          waitingForBlockly: false,
+          getBlocklyCallbacks: []
+        }
+        const LazySB = vm.$LazySB;
+        if (!LazySB.waitingForBlockly) {
+          const LazySB = vm.$LazySB;
+          if (LazySB.$dev) console.log('waiting for blockly');
+          LazySB.onBlockly((Blockly) => {
+            const LazySB = vm.$LazySB;
+            if (LazySB.$dev) console.log('onBlockly callback called');
+            while (LazySB.getBlocklyCallbacks.length > 0) {
+              const callback = LazySB.getBlocklyCallbacks.shift();
+              if (typeof callback === 'function') callback(Blockly);
+            }
+            LazySB.waitingForBlockly = false;
+            if (LazySB.$dev) console.log('no longer waiting for Blockly');
+          });
+          LazySB.waitingForBlockly = true;
+        }
+        LazySB.getBlocklyCallbacks.push(function(Blockly) {
+          resolve_getBlockly(Blockly);
+        });
+      });
+    }
+    if (!Scratch?.gui) Scratch.gui = Scratch?.gui ?? {
+      getBlockly,
+      getBlocklyEagerly() {
+        console.warn('Scratch.gui.getBlocklyEagerly is patched in and does not work!');
+        return this.getBlockly();
+      }
+    }
+  })(Scratch);
+}
+
+/***/ }),
+
 /***/ "./src/setup.js":
 /*!**********************!*\
   !*** ./src/setup.js ***!
@@ -689,6 +757,7 @@ module.exports = function setup() {
     }
     Scratch.extensions.register(new PawedLoaderLabel);
     window.Scratch = Scratch;
+    vm.paw._patchScratchGUI(Scratch);
   }).toString()+')(Scratch);'));
 };
 
@@ -1087,16 +1156,18 @@ module.exports = {
 /*!*******************************!*\
   !*** ./src/utils/scratchz.js ***!
   \*******************************/
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 // I did make this, its just the only copy I have.
 class ScratchZ {constructor(){this.c_gbw="gui_blocks-wrapper",this.__rc="__reactContainer",this.__rii="__reactInternalInstance$";const t=window.Scratch||{};this.BlockType=t?.BlockType||{BOOLEAN:"Boolean",BUTTON:"button",LABEL:"label",COMMAND:"command",CONDITIONAL:"conditional",EVENT:"event",HAT:"hat",LOOP:"loop",REPORTER:"reporter",XML:"xml"},this.ArgumentType=t?.ArgumentType||{ANGLE:"angle",BOOLEAN:"Boolean",COLOR:"color",NUMBER:"number",STRING:"string",MATRIX:"matrix",NOTE:"note",IMAGE:"image",COSTUME:"costume",SOUND:"sound"},this.TargetType=t?.TargetType||{SPRITE:"sprite",STAGE:"stage"}}get on_projectPage(){return"object"==typeof this.ReduxState?.scratchGui}get on_homePage(){return"object"==typeof this.ReduxState?.splash}get on_profilePage(){return!!app?.profileModel?.getId?.()}get on_messagesPage(){return"string"==typeof this.ReduxState?.messages?.status?.clear&&!this.on_homePage}get gbWrapper(){return document.querySelector(`[class^="${this.c_gbw}"]`)}get containerKey(){return(Object.keys(app)||[]).find((t=>t.startsWith(this.__rc)))}get instanceKey(){return Object.keys(this.gbWrapper||{}).find((t=>t.startsWith(this.__rii)))}get ReduxStore(){return app[this.containerKey]?.child?.stateNode?.store}get ReduxState(){return this.ReduxStore?.getState?.()}get vm(){return window.vm||this.ReduxState?.scratchGui?.vm}get Blocks(){if("object"==typeof window?.ScratchBlocks)return window.ScratchBlocks;const t=Object.entries(this.gbWrapper||{}).find((t=>t[0].startsWith(this.__rii)))?.[1];if(!t)return;let e=t;for(;e&&!e?.stateNode?.ScratchBlocks;)e=e.child;return e.stateNode.ScratchBlocks}};
 const ScratchZinstance = new ScratchZ;
 let instance = ScratchZinstance;
+__webpack_require__(/*! ../patches/Scratch_gui_getBlockly */ "./src/patches/Scratch_gui_getBlockly.js")(instance);
 const useScratch = Scratch => {
   instance = Scratch;
   Scratch.ReduxStore = ScratchZinstance.ReduxStore;
   Scratch.ReduxState = ScratchZinstance.ReduxState;
+  __webpack_require__(/*! ../patches/Scratch_gui_getBlockly */ "./src/patches/Scratch_gui_getBlockly.js")(Scratch);
   if (Scratch?.gui) Scratch.gui.getBlockly().then(Blockly => Scratch.Blocks = Blockly);
 };
 vm.on('CREATE_UNSANDBOXED_EXTENSION_API', Scratch => useScratch(Scratch));
@@ -1151,6 +1222,10 @@ var __webpack_exports__ = {};
 const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
 const vm = (__webpack_require__(/*! ./defs */ "./src/defs.js").vm);
 const GUI = __webpack_require__(/*! ./gui */ "./src/gui.js");
+
+// Exposing Scratch.gui.getBlockly patch.
+GUI.constructor.prototype._patchScratchGUI = __webpack_require__(/*! ./patches/Scratch_gui_getBlockly */ "./src/patches/Scratch_gui_getBlockly.js");
+
 GUI.setup();
 GUI.addons.load();
 minilog.log('Loaded.');

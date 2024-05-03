@@ -14,5 +14,6 @@ module.exports = function setup() {
     }
     Scratch.extensions.register(new PawedLoaderLabel);
     window.Scratch = Scratch;
+    vm.paw._patchScratchGUI(Scratch);
   }).toString()+')(Scratch);'));
 };
