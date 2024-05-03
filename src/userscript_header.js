@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PawedLoader
 // @namespace    https://google.com/
-// @version      0.0.1
+// @version      0.0.1a
 // @updateURL    https://pawedloader.github.io/PawedLoader/$release.js
 // @description  W.I.P
 // @author       Ashimee
