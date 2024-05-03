@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PawedLoader
 // @namespace    https://google.com/
-// @version      0.0.1a
+// @version      0.0.2a
 // @downloadURL  https://pawedloader.github.io/PawedLoader/$release.js
 // @updateURL    https://pawedloader.github.io/PawedLoader/src/$release.ver
 // @description  W.I.P
@@ -15,7 +15,7 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1714778807285 */
+/* Last build: 1714778892958 */
 (async function() {
   /******/ (() => { // webpackBootstrap
   /******/ 	var __webpack_modules__ = ({
@@ -697,7 +697,7 @@
   
   const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
   
-  const version = `0.0.1a`;
+  const version = `0.0.2a`;
   
   const ReduxStore = ScratchZ.ReduxStore, vm = ScratchZ.vm, runtime = vm.runtime;
   const onDesktopApp = document.location.href.includes('resources/app.asar');
