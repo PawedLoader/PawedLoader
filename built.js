@@ -13,8 +13,1162 @@
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
 // you lose the game :trol:
-/* Last build: 1712937526175 */
+/* Last build: 1714751054369 */
 (async function() {
-(()=>{var e={287:(e,t,s)=>{const n=s(242),r="AshimeesExample";var o;e.exports={name:"Example - Mhm",id:r,description:"a very cool addon!",lastupdate:"04/05/2024",setup:function(){o.cool=!0,console.log("Wow!")},data:o=n.getData(r)}},466:(e,t,s)=>{const n=s(242),r="Ashimee";e.exports={name:"Extension loading error catcher.",id:r,description:"Catches errors when extensions load.",lastupdate:"04/11/2024",setup:function(){},data:n.getData(r)}},242:e=>{e.exports=new class{constructor(){}getData(e){return{}}}},550:(e,t,s)=>{e.exports=class{constructor(){this.addonIds=s(426)}get addons(){const e={};return addons.forEach((t=>{const n=s(782)(`./addon-${t}/main.js`);e[t]=n})),addons}}},426:e=>{e.exports=[]},357:(e,t,s)=>{const n=s(550);e.exports=new class extends n{constructor(){super(),this.api=s(242)}load(){}}},782:(e,t,s)=>{var n={"./addon-example/main.js":287,"./addon-exterrcatch/main.js":466};function r(e){var t=o(e);return s(t)}function o(e){if(!s.o(n,e)){var t=new Error("Cannot find module '"+e+"'");throw t.code="MODULE_NOT_FOUND",t}return n[e]}r.keys=function(){return Object.keys(n)},r.resolve=o,e.exports=r,r.id=782},847:(e,t,s)=>{const n=s(791),r=s(878).base64ToArrayBuffer;e.exports=class{constructor(){this.assets={},this.prefix=null}async saveGZ(e,t,s){s=s??null,this.assets[e]={data:await(await new n(r(t)).extract()).text(),prefix:s}}get(e){const t=this.assets[e];return t.data?.read&&(t.data=t.data.read()),t.prefix?`${t.prefix}${t.data}`:t.data}update(e,t){const s=this.assets[e];s.data="function"!=typeof t?t:t(s.data)}}},493:(e,t,s)=>{const n=s(878).hasOwn;class r extends EventTarget{constructor(){super(),this.events={}}register(e){this.events[e]=[]}emit(e,...t){if(!n(this.events,e))return;const s=this.events[e];let r=0;for(let e=0;e<s.length;e++){const n=s[e-r];n.callback(...t),n.deleteWhenCalled&&(s.pop(e-r),r++)}}on(e,t){n(this.events,e)&&this.events[e].push({deleteWhenCalled:!1,callback:t})}once(e,t){n(this.events,e)&&this.events[e].push({deleteWhenCalled:!0,callback:t})}wipe(){for(const e in events)events[e]=[]}}e.exports=r},791:(e,t,s)=>{const{readBytes:n,readFlags:r,readString:o,readTerminatedString:i,unixTimestampToDate:a,bufferToStream:d,downloadArrayBuffer:c,downloadBlob:h,streamToBlob:l}=s(878);e.exports=class{#e;#t=0;#s;header;fileName;comment;constructor(e){this.#e=new DataView(e),this.read()}read(){if(this.header={signature:o(this.#e,0,2),compressionMethod:this.#e.getUint8(1),flags:r(this.#e,3,["ftext","fhcrc","fextra","fname","fcomment","reserved1","reserved2","reserved3"]),modificationTime:a(this.#e.getUint32(4,!0)),extraFlags:this.#e.getUint8(8),os:this.#e.getUint8(9)},this.#t=10,this.header.flags.fextra){const e=this.#e.getUint16(this.#t,!0);this.extra=n(this.#e,this.#t+2,e),this.#t+=e+2}else this.extra=[];this.header.flags.fname?(this.fileName=i(this.#e,this.#t),this.#t+=this.fileName.length+1):this.fileName="",this.header.flags.fcomment?(this.comment=i(this.#e,this.#t),this.#t+=this.comment.length+1):this.comment="",this.header.flags.fhcrc?(this.#s=this.#e.getUint16(this.#t,!0),this.#t+=2):this.#s=null,this.footer={crc:this.#e.getUint32(this.#e.byteLength-8,!0),uncompressedSize:this.#e.getUint32(this.#e.byteLength-4,!0)}}extract(){return l(d(this.#e.buffer.slice(this.#t,this.#e.byteLength-8)).pipeThrough(new DecompressionStream("deflate-raw")))}}},583:e=>{const t=document.querySelector("[class^=menu-bar_file-group]");t.querySelector("[class^=menu-bar_menu-bar-item]"),e.exports=class{constructor(e,s,n){const r=document.querySelector("div[class^=menu-bar_menu-bar-item]").cloneNode(!0);this.node=r,this.isDropdown=n??!1,this.image=s??void 0,t.appendChild(r),this.hide();const o=r.querySelectorAll("img");this.isDropdown||(o[1].remove(),r.querySelector("div[class^=menu-bar_menu-bar-menu]").remove()),this.image||o[0].remove(),this.setLabel(e)}setLabel(e){this.node.querySelector("span[class^=settings-menu_dropdown-label]").innerHTML=e}show(){this.node.style.display=""}hide(){this.node.style.display="none"}remove(){this.node.remove()}}},290:(e,t,s)=>{const n=s(493);e.exports=class extends n{constructor(){super(),this.stateObject={}}}},394:(e,t,s)=>{const n=s(352),r=n.ReduxStore,o=n.vm,i=o.runtime,a=document.location.href.includes("resources/app.asar");e.exports={version:"0.0.1",onDesktopApp:a,ScratchZ:n,ReduxStore:r,vm:o,runtime:i}},611:(e,t,s)=>{const n=s(493),{ReduxStore:r,ScratchZ:o}=s(394);e.exports=new class extends n{constructor(){super(),this._wasInEditor=this.inEditor,this._loadingGUI=!this.GUIavailable,this.register("OPENED"),this.register("OPENED/gui_events"),this.register("CLOSED"),this.register("CLOSED/gui_events"),this.register("GUI_LOADED"),r.subscribe((()=>{this._loadingGUI&&(this.GUIavailable&&(this._loadingGUI=!1),this.emit("GUI_LOADED")),this._wasInEditor!==this.inEditor&&(this._wasInEditor?this.emit("CLOSED"):this.emit("OPENED"))})),this._wasInEditor&&setTimeout((()=>{this.emit("OPENED",0)}),500),this.on("OPENED",(e=>{setTimeout((()=>this.emit("OPENED/gui_events")),e??500)})),this.on("CLOSED",(()=>{setTimeout((()=>this.emit("CLOSED/gui_events")),500)}))}get GUIavailable(){return"LOADING_VM_NEW_DEFAULT"!==this.projectState.loadingState}get inEditor(){const e=r.getState();return!!e&&!e.scratchGui.mode.isPlayerOnly}get projectState(){const e=r.getState();return!!e&&e.scratchGui.projectState}}},643:(e,t,s)=>{const n=s(701),r=s(493),o=s(583),i=s(352);e.exports=new class extends r{constructor(){super(),this.register("ASSETS_LOADED"),this.editor=s(611),this.addons=s(357),this.assets=s(658),this.styles=document.createElement("style"),this.styles.css=s(708),this._modal=null,this._menubutton=this.makeButton}get makeButton(){const e=new o("PawedLoader",null,!1);return e.node.addEventListener("click",(e=>this.menuButtonClicked(e))),e}get makeModal(){this._modal&&this._modal.remove();const e=document.createElement("dialog");return document.body.appendChild(e),e.setAttribute("paw-for","modal"),this.styles.textContent=this.styles.css.get(),e.appendChild(this.styles),this._modal=e,this.constructGUI(),e}setupAllGUI(){if(this._modal)try{this._modal.remove()}catch{}this._modal=this.makeModal,this.regenButton(),n.log("GUI Built")}async setup(){this.editor.once("GUI_LOADED",(()=>{this.editor.inEditor&&this.editor.emit("SCRATCHBLOCKS",i.Blocks),s(205)()})),this.assets.loadAssets().then((()=>{this.emit("ASSETS_LOADED"),n.log("Assets loaded!"),this.editor.on("OPENED/gui_events",(()=>this.regenButton())),this.editor.on("CLOSED/gui_events",(()=>this.regenButton())),this.setupAllGUI()}))}regenButton(){if(this._menubutton)try{this._menubutton.remove()}catch{}this._menubutton=this.makeButton,this._menubutton.show()}menuButtonClicked(e){this.show()}constructGUI(){this._modal.appendChild(s(235).ui(this))}show(){this._modal=this.makeModal,this._modal.showModal()}hide(){this._modal.innerHTML="",this._modal.remove()}}},205:(e,t,s)=>{e.exports=function(){s(850).url("data:application/javascript;base64,"+btoa("("+function(e){e.extensions.register(new class{getInfo(){return{id:"AshimeePawedLoader",name:"PawedLoader",blocks:[{blockType:e.BlockType.XML,xml:'<sep gap="0" />'}]}}}),window.Scratch=e}.toString()+")(Scratch);"))}},658:(e,t,s)=>{const n=new(s(847));n.loadAssets=async function(){await n.saveGZ("icon","H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==","data:image/svg+xml;base64,"),n.update("icon",(e=>btoa(e.replace("<svg ",'<svg style="fill:#ffffff;" '))))},e.exports=n},708:e=>{let t="\n/* css will go here */\n";e.exports={get:()=>t,set(e){t=e}}},235:(e,t,s)=>{const n=s(290),r=s(394).version;class o extends n{constructor(e,t,...s){super(...s),this.node=document.createElement(e),this.node.setAttribute("paw-for",t)}}class i extends o{constructor(e){super("div","header"),this.GUI=e,this.createHeader()}createHeader(){const e=document.createElement("div");e.appendChild(document.createTextNode("PawedLoader")),e.appendChild(document.createTextNode(`v${r}`)),e.setAttribute("paw-for","header-title");const t=document.createElement("button");t.textContent="X",t.onclick=e=>this.GUI.hide(),t.setAttribute("paw-for","modal-close"),this.node.appendChild(e),this.node.appendChild(t)}}class a extends o{constructor(e){super("div","tabs"),this.body=e,this.register("TAB_CHANGED"),this.tabNumber=e.tabNumber,this.tabs={Extensions:["Merged","Unmerged"],"N/A~1":["Packager","Addons","Themes"]}}tabClicked(e,t){this.tabNumber=Number(e.getAttribute("paw-tabNumber")),this.emit("TAB_CHANGED",this.tabNumber)}get generateTabs(){let e=0;const t=document.createElement("div");t.setAttribute("paw-for","tab-sect");for(const s of Object.entries(this.tabs)){const n=document.createTextNode(s[0]),r=document.createElement("div");r.setAttribute("paw-for","tab-sect-body");const o=s[1];for(const t of o){e++;const s=document.createElement("button");s.textContent=t,s.setAttribute("paw-for","tab-button"),s.setAttribute("paw-tabNumber",String(e)),s.setAttribute("paw-active",String(this.tabNumber===e)),s.onclick=e=>this.tabClicked(s,e),r.appendChild(s)}const i=document.createElement("div");i.setAttribute("paw-for","tab-sect-pop"),s[0].startsWith("N/A")||i.appendChild(n),i.appendChild(r),t.appendChild(i)}return t}get getNode(){return this.node.innerHTML="",this.node.appendChild(this.generateTabs),this.node}}class d extends o{constructor(){super("div","body"),this.tabNumber=1,this.tabs=new a(this),this.tabs.on("TAB_CHANGED",(e=>this.renderTab(e))),this.renderTab(this.tabNumber)}get getTab(){const e=document.createElement("div");return e.appendChild(document.createTextNode(String(this.tabNumber))),e.setAttribute("paw-for","tab-render"),e}renderTab(e){this.tabNumber=e,this.node.innerHTML="",this.node.appendChild(this.tabs.getNode),this.node.appendChild(this.getTab)}}class c extends o{constructor(){super("div","footer")}}e.exports=new class extends o{constructor(){super("paw","main")}ui(e){const t=new i(e),s=new d,n=new c;return this.node.innerHTML="",this.node.appendChild(t.node),this.node.appendChild(s.node),this.node.appendChild(n.node),this.node}}},878:e=>{function t(e,t="download.x"){const s=window.URL.createObjectURL(e),n=document.createElement("a");n.href=s,n.setAttribute("download",t),n.click(),window.URL.revokeObjectURL(s)}e.exports={wait:e=>new Promise(((t,s)=>{setTimeout(t,e)})),hasOwn:(e,t)=>Object.prototype.hasOwnProperty.call(e,t),readBytes:function(e,t,s){const n=[];for(let r=0;r<s;r++)n.push(e.getUint8(t+r));return n},readFlags:function(e,t,s){const n={};for(let r=0;r<s.length;r++){const o=e.getUint8(t+Math.min(r/8));n[s[r]]=(1<<r&o)>>r==1}return n},readString:function(e,t,s){const n=[];for(let r=0;r<s;r++)n.push(String.fromCharCode(e.getUint8(t+r)));return n.join("")},readTerminatedString:function(e,t){const s=[];let n,r=0;for(;0!=n;)n=e.getUint8(t+r),0!=n&&s.push(String.fromCharCode(n)),r++;return s.join("")},unixTimestampToDate:function(e){return new Date(1e3*e)},bufferToStream:function(e){return new ReadableStream({start(t){t.enqueue(e),t.close()}})},downloadArrayBuffer:function(e,s){t(new Blob([e]),s)},downloadBlob:t,streamToBlob:async function(e,t){const s=e.getReader();let n=!1;const r=[];for(;!n;){const e=await s.read();n=e.done,e.value&&r.push(e.value)}return new Blob(r,{type:t})},base64ToArrayBuffer:function(e){for(var t=atob(e),s=new Uint8Array(t.length),n=0;n<t.length;n++)s[n]=t.charCodeAt(n);return s.buffer}}},701:e=>{const t="PawLoader |";e.exports={log:(...e)=>console.log(t,...e),warn:(...e)=>console.warn(t,...e),error:(...e)=>console.error(t,...e)}},850:(e,t,s)=>{const{vm:n,runtime:r}=s(394);e.exports={plugin:function(e){var t=new e(r),s=n.extensionManager._registerInternalExtension(t);n.extensionManager._loadedExtensions.set(t.getInfo().id,s)},url:async function(e){const t=n.extensionManager,s=t.securityManager,r=s.getSandboxMode;s.getSandboxMode=function(){return"unsandboxed"},await t.loadExtensionURL(e),s.getSandboxMode=r}}},352:e=>{const t=new class{constructor(){this.c_gbw="gui_blocks-wrapper",this.__rc="__reactContainer",this.__rii="__reactInternalInstance$";const e=window.Scratch||{};this.BlockType=e?.BlockType||{BOOLEAN:"Boolean",BUTTON:"button",LABEL:"label",COMMAND:"command",CONDITIONAL:"conditional",EVENT:"event",HAT:"hat",LOOP:"loop",REPORTER:"reporter",XML:"xml"},this.ArgumentType=e?.ArgumentType||{ANGLE:"angle",BOOLEAN:"Boolean",COLOR:"color",NUMBER:"number",STRING:"string",MATRIX:"matrix",NOTE:"note",IMAGE:"image",COSTUME:"costume",SOUND:"sound"},this.TargetType=e?.TargetType||{SPRITE:"sprite",STAGE:"stage"}}get on_projectPage(){return"object"==typeof this.ReduxState?.scratchGui}get on_homePage(){return"object"==typeof this.ReduxState?.splash}get on_profilePage(){return!!app?.profileModel?.getId?.()}get on_messagesPage(){return"string"==typeof this.ReduxState?.messages?.status?.clear&&!this.on_homePage}get gbWrapper(){return document.querySelector(`[class^="${this.c_gbw}"]`)}get containerKey(){return(Object.keys(app)||[]).find((e=>e.startsWith(this.__rc)))}get instanceKey(){return Object.keys(this.gbWrapper||{}).find((e=>e.startsWith(this.__rii)))}get ReduxStore(){return app[this.containerKey]?.child?.stateNode?.store}get ReduxState(){return this.ReduxStore?.getState?.()}get vm(){return window.vm||this.ReduxState?.scratchGui?.vm}get Blocks(){if("object"==typeof window?.ScratchBlocks)return window.ScratchBlocks;const e=Object.entries(this.gbWrapper||{}).find((e=>e[0].startsWith(this.__rii)))?.[1];if(!e)return;let t=e;for(;t&&!t?.stateNode?.ScratchBlocks;)t=t.child;return t.stateNode.ScratchBlocks}};let s=t;vm.on("CREATE_UNSANDBOXED_EXTENSION_API",(e=>(e=>{s=e,e.ReduxStore=t.ReduxStore,e.ReduxState=t.ReduxState,e?.gui&&e.gui.getBlockly().then((t=>e.Blocks=t))})(e))),e.exports=(new class{get instance(){return s}}).instance}},t={};function s(n){var r=t[n];if(void 0!==r)return r.exports;var o=t[n]={exports:{}};return e[n](o,o.exports,s),o.exports}s.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),(()=>{const e=s(701),t=s(394).vm,n=s(643);n.setup(),n.addons.load(),e.log("Loaded."),t.paw=n,t.paw._loadRequire=()=>{if(t.paw.require)return t.paw.require;try{return t.paw.require=s,t.paw.require}catch{console.error("Failed to expose __webpack_require_")}}})()})();
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/addons/addon-example/main.js":
+/*!******************************************!*\
+  !*** ./src/addons/addon-example/main.js ***!
+  \******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const addonAPI = __webpack_require__(/*! ../api */ "./src/addons/api.js");
+
+const addonID = 'AshimeesExample';
+module.exports = (function(addonData) {
+  
+  function setup() {
+    addonData['cool'] = true;
+    console.log('Wow!');
+  }
+  function main() {}
+
+  return {
+    name: 'Example - Mhm', id: addonID,
+    description: 'a very cool addon!',
+    lastupdate: '04/05/2024',
+    /* DO NOT CHANGE */
+    setup, data: addonData
+  }
+})(addonAPI.getData(addonID));
+
+/***/ }),
+
+/***/ "./src/addons/addon-exterrcatch/main.js":
+/*!**********************************************!*\
+  !*** ./src/addons/addon-exterrcatch/main.js ***!
+  \**********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+// todo: this when garbo adds what i asked for.
+const addonAPI = __webpack_require__(/*! ../api */ "./src/addons/api.js");
+
+const addonID = 'Ashimee';
+module.exports = (function(addonData) {
+  
+  function setup() {
+    // damn
+  }
+  function main() {}
+
+  return {
+    name: 'Extension loading error catcher.', id: addonID,
+    description: 'Catches errors when extensions load.',
+    lastupdate: '04/30/2024',
+    /* DO NOT CHANGE */
+    setup, data: addonData
+  }
+})(addonAPI.getData(addonID));
+
+/***/ }),
+
+/***/ "./src/addons/api.js":
+/*!***************************!*\
+  !*** ./src/addons/api.js ***!
+  \***************************/
+/***/ ((module) => {
+
+class AddonAPI {
+  constructor() {}
+  getData(addonID) {
+    return {};
+  }
+}
+module.exports = new AddonAPI;
+
+/***/ }),
+
+/***/ "./src/addons/classes/AddonExporter.js":
+/*!*********************************************!*\
+  !*** ./src/addons/classes/AddonExporter.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = class AddonExporter {
+  constructor() {
+    this.addonIds = __webpack_require__(/*! ../export */ "./src/addons/export.js");
+  }
+  get addons() {
+    const _addons = {};
+    addons.forEach(addonID => {
+      const addon = __webpack_require__("./src/addons sync recursive ^\\.\\/addon\\-.*\\/main\\.js$")(`./addon-${addonID}/main.js`);
+      _addons[addonID] = addon;
+    });
+    return addons;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/addons/export.js":
+/*!******************************!*\
+  !*** ./src/addons/export.js ***!
+  \******************************/
+/***/ ((module) => {
+
+// Addon files
+module.exports = [];
+
+/***/ }),
+
+/***/ "./src/addons/manager.js":
+/*!*******************************!*\
+  !*** ./src/addons/manager.js ***!
+  \*******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const AddonExporter = __webpack_require__(/*! ./classes/AddonExporter */ "./src/addons/classes/AddonExporter.js");
+class Addons extends AddonExporter {
+  constructor() {
+    super();
+    this.api = __webpack_require__(/*! ./api */ "./src/addons/api.js");
+  }
+  load() {}
+}
+module.exports = new Addons;
+
+/***/ }),
+
+/***/ "./src/addons sync recursive ^\\.\\/addon\\-.*\\/main\\.js$":
+/*!****************************************************!*\
+  !*** ./src/addons/ sync ^\.\/addon\-.*\/main\.js$ ***!
+  \****************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var map = {
+	"./addon-example/main.js": "./src/addons/addon-example/main.js",
+	"./addon-exterrcatch/main.js": "./src/addons/addon-exterrcatch/main.js"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./src/addons sync recursive ^\\.\\/addon\\-.*\\/main\\.js$";
+
+/***/ }),
+
+/***/ "./src/classes/AssetHandler.js":
+/*!*************************************!*\
+  !*** ./src/classes/AssetHandler.js ***!
+  \*************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const GZip = __webpack_require__(/*! ../classes/GZip */ "./src/classes/GZip.js");
+const base64ToArrayBuffer = (__webpack_require__(/*! ../utils/index */ "./src/utils/index.js").base64ToArrayBuffer);
+
+module.exports = class AssetsHandler {
+  constructor() {
+    this.assets = {};
+    this.prefix = null;
+  }
+  async saveGZ(assetName, gzBase64, prefix) {
+    prefix = prefix ?? null;
+    // Load asset into memory after decoding the base64 and unzipping
+    this.assets[assetName] = {data: (await (await (new GZip(base64ToArrayBuffer(gzBase64)).extract())).text()), prefix};
+  }
+  get(assetName) {
+    const asset = this.assets[assetName];
+    if (asset.data?.read) asset.data = asset.data.read();
+    if (asset.prefix) return `${asset.prefix}${asset.data}`;
+    return asset.data;
+  }
+  update(assetName, updator) {
+    const asset = this.assets[assetName];
+    if (typeof updator === 'function') {
+      asset.data = updator(asset.data);
+      return;
+    }
+    asset.data = updator;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/classes/EventEmitter.js":
+/*!*************************************!*\
+  !*** ./src/classes/EventEmitter.js ***!
+  \*************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const hasOwn = (__webpack_require__(/*! ../utils/index */ "./src/utils/index.js").hasOwn);
+
+class EventEmitter extends EventTarget {
+  constructor() {
+    super();
+    this.events = {};
+  }
+
+  /**
+   * Register a new kind of event
+   * @param {String} eventName Event name
+   */
+  register(eventName) {
+    this.events[eventName] = [];
+  }
+
+  /**
+   * Calls every event with the event name
+   * @param {String} eventName Event name
+   * @param {Any} data Data to pass to the event handlers
+   */
+  emit(eventName, ...data) {
+    if (!hasOwn(this.events, eventName)) return;
+    const events = this.events[eventName];
+    let popped = 0;
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i - popped];
+      event.callback(...data);
+      if (event.deleteWhenCalled) {
+        events.pop(i - popped);
+        popped++;
+      }
+    }
+  }
+
+  /**
+   * When an event happens call this
+   * @param {String} eventName Event name
+   * @param {Function} callback Function to run when the event is received
+   */
+  on(eventName, callback) {
+    if (!hasOwn(this.events, eventName)) return;
+    this.events[eventName].push({
+      deleteWhenCalled: false,
+      callback,
+    });
+  }
+
+  /**
+   * When an event happens call this but only let it happen once
+   * @param {String} eventName Event name
+   * @param {Function} callback Function to run when the event is received
+   */
+  once(eventName, callback) {
+    if (!hasOwn(this.events, eventName)) return;
+    this.events[eventName].push({
+      deleteWhenCalled: true,
+      callback,
+    });
+  }
+
+  /**
+   * Clears all the events
+   */
+  wipe() {
+    for (const event in events) {
+      events[event] = [];
+    }
+  }
+}
+module.exports = EventEmitter;
+
+/***/ }),
+
+/***/ "./src/classes/GZip.js":
+/*!*****************************!*\
+  !*** ./src/classes/GZip.js ***!
+  \*****************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const {
+  readBytes,
+  readFlags,
+  readString,
+  readTerminatedString,
+  unixTimestampToDate,
+  bufferToStream,
+  downloadArrayBuffer,
+  downloadBlob,
+  streamToBlob
+} = __webpack_require__(/*! ../utils */ "./src/utils/index.js");
+module.exports = class GZip {
+  #dataView;
+  #index = 0;
+  #crc16;
+
+  header;
+  fileName;
+  comment;
+
+  constructor(arrayBuffer) {
+      this.#dataView = new DataView(arrayBuffer);
+      this.read();
+  }
+  read(){
+      this.header = {
+          signature: readString(this.#dataView, 0, 2), //should be xf8b
+          compressionMethod: this.#dataView.getUint8(1), //should be 0x08
+          flags: readFlags(this.#dataView, 3, ["ftext", "fhcrc", "fextra", "fname", "fcomment", "reserved1", "reserved2", "reserved3"]), //need to figure out if we read extra data in stream
+          modificationTime: unixTimestampToDate(this.#dataView.getUint32(4, true)),
+          extraFlags: this.#dataView.getUint8(8), //not important but is either 2 (best compression) or 4 (fast)
+          os: this.#dataView.getUint8(9), //not useful but usually 0 on windows, 3 Unix, 7 mac
+      };
+      this.#index = 10;
+
+      if(this.header.flags.fextra){
+          const extraLength = this.#dataView.getUint16(this.#index, true);
+          this.extra = readBytes(this.#dataView, this.#index + 2, extraLength);
+          this.#index += extraLength + 2;
+      } else {
+          this.extra = [];
+      }
+
+      if(this.header.flags.fname){
+          this.fileName = readTerminatedString(this.#dataView, this.#index);
+          this.#index += this.fileName.length + 1; //+1 for null terminator
+      } else {
+          this.fileName = "";
+      }
+
+      if(this.header.flags.fcomment){
+          this.comment = readTerminatedString(this.#dataView, this.#index);
+          this.#index += this.comment.length + 1; //+1 for null terminator
+      } else {
+          this.comment = "";
+      }
+
+      if(this.header.flags.fhcrc){
+          this.#crc16 = this.#dataView.getUint16(this.#index, true);
+          this.#index += 2;
+      } else {
+          this.#crc16 = null;
+      }
+
+      //footer
+      this.footer = {
+          crc: this.#dataView.getUint32(this.#dataView.byteLength - 8, true),
+          uncompressedSize: this.#dataView.getUint32(this.#dataView.byteLength - 4, true),
+      }
+  }
+  extract(){
+      //If you don't care about the file data just do this:
+      //return streamToBlob(bufferToStream(this.#dataView.buffer).pipeThrough(new DecompressionStream("gzip")));
+      //Otherwise slice where the data starts to the last 8 bytes
+      return streamToBlob(bufferToStream(this.#dataView.buffer.slice(this.#index, this.#dataView.byteLength - 8)).pipeThrough(new DecompressionStream("deflate-raw")));
+  }
+}
+
+/***/ }),
+
+/***/ "./src/classes/MenuBarButton.js":
+/*!**************************************!*\
+  !*** ./src/classes/MenuBarButton.js ***!
+  \**************************************/
+/***/ ((module) => {
+
+const fileGroupBar = document.querySelector('[class^=menu-bar_file-group]');
+const buttonHoverClasses = fileGroupBar.querySelector('[class^=menu-bar_menu-bar-item]');
+
+/**
+ * Makes a button
+ */
+class MenuBarButton {
+  /**
+   * Constructor
+   * @param {String} html
+   * @param {String} image An image url, this is not required
+   * @param {Boolean} isDropdown Weather or not this has a dropdown attached to it
+   */
+  constructor(html, image, isDropdown) {
+    const newButton = document.querySelector('div[class^=menu-bar_menu-bar-item]').cloneNode(true);
+    this.node = newButton;
+    this.isDropdown = isDropdown ?? false;
+    this.image = image ?? undefined;
+    fileGroupBar.appendChild(newButton);
+    this.hide();
+    const images = newButton.querySelectorAll('img');
+    if (!this.isDropdown) {
+      images[1].remove();
+      newButton.querySelector('div[class^=menu-bar_menu-bar-menu]').remove();
+    }
+    if (!this.image) images[0].remove();
+    this.setLabel(html);
+  }
+
+  /**
+   * Sets the label to the specified HTML
+   * @param {String} html The HTML of the label
+   */
+  setLabel(html) {
+    this.node.querySelector('span[class^=settings-menu_dropdown-label]').innerHTML = html;
+  }
+
+  /**
+   * Shows the button
+   */
+  show() {
+    this.node.style.display = '';
+  }
+
+  /**
+   * Hides the button
+   */
+  hide() {
+    this.node.style.display = 'none';
+  }
+
+  /**
+   * Removes the button
+   */
+  remove() {
+    this.node.remove();
+  }
+}
+module.exports = MenuBarButton;
+
+/***/ }),
+
+/***/ "./src/classes/State.js":
+/*!******************************!*\
+  !*** ./src/classes/State.js ***!
+  \******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const EventEmitter = __webpack_require__(/*! ./EventEmitter */ "./src/classes/EventEmitter.js");
+
+module.exports = class State extends EventEmitter {
+  constructor() {
+    super();
+    this.stateObject = {};
+  }
+}
+
+/***/ }),
+
+/***/ "./src/classes/Tab.js":
+/*!****************************!*\
+  !*** ./src/classes/Tab.js ***!
+  \****************************/
+/***/ ((module) => {
+
+module.exports = class Tab {
+  constructor(body) {
+    this.body = body;
+    this.node = null;
+  }
+  get getNode() {
+    return this.node;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/defs.js":
+/*!*********************!*\
+  !*** ./src/defs.js ***!
+  \*********************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
+
+const version = `0.0.1`;
+
+const ReduxStore = ScratchZ.ReduxStore, vm = ScratchZ.vm, runtime = vm.runtime;
+const onDesktopApp = document.location.href.includes('resources/app.asar');
+
+module.exports = {
+  // Constants
+  version,
+  onDesktopApp,
+  // GUI stuff
+  ScratchZ,
+  ReduxStore,
+  // "VM" stuff
+  vm,
+  runtime
+}
+
+
+/***/ }),
+
+/***/ "./src/editor.js":
+/*!***********************!*\
+  !*** ./src/editor.js ***!
+  \***********************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const EventEmitter = __webpack_require__(/*! ./classes/EventEmitter */ "./src/classes/EventEmitter.js");
+const { ReduxStore, ScratchZ } = __webpack_require__(/*! ./defs */ "./src/defs.js");
+
+class Editor extends EventEmitter {
+  constructor() {
+    super();
+    // Setup
+    this._wasInEditor = this.inEditor;
+    this._loadingGUI = !this.GUIavailable;
+    // Events
+    this.register('OPENED'); this.register('OPENED/gui_events');
+    this.register('CLOSED'); this.register('CLOSED/gui_events');
+    this.register('GUI_LOADED');
+    ReduxStore.subscribe(() => {
+      if (this._loadingGUI) {
+        if (this.GUIavailable) this._loadingGUI = false;
+        this.emit('GUI_LOADED');
+      }
+      if (this._wasInEditor !== this.inEditor) {
+        if (this._wasInEditor) this.emit('CLOSED');
+        else this.emit('OPENED');
+      }
+    });
+    if (this._wasInEditor) setTimeout(() => {
+      this.emit('OPENED', 0);
+    }, 500);
+    this.on('OPENED', (guiDelay) => {
+      setTimeout(() => this.emit('OPENED/gui_events'), guiDelay ?? 500);
+    });
+    this.on('CLOSED', () => {
+      setTimeout(() => this.emit('CLOSED/gui_events'), 500);
+    });
+  }
+  get GUIavailable() {
+    return this.projectState.loadingState !== 'LOADING_VM_NEW_DEFAULT';
+  }
+  get inEditor() {
+    const state = ReduxStore.getState();
+    if (!state) return false;
+    return !state.scratchGui.mode.isPlayerOnly;
+  }
+  get projectState() {
+    const state = ReduxStore.getState();
+    if (!state) return false;
+    return state.scratchGui.projectState;
+  }
+}
+module.exports = new Editor;
+
+/***/ }),
+
+/***/ "./src/gui.js":
+/*!********************!*\
+  !*** ./src/gui.js ***!
+  \********************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
+
+const EventEmitter = __webpack_require__(/*! ./classes/EventEmitter */ "./src/classes/EventEmitter.js");
+const MenuBarButton = __webpack_require__(/*! ./classes/MenuBarButton */ "./src/classes/MenuBarButton.js");
+const ScratchZ = __webpack_require__(/*! ./utils/scratchz */ "./src/utils/scratchz.js");
+
+class GUI extends EventEmitter {
+  constructor() {
+    super();
+    // Setup events
+    this.register('ASSETS_LOADED');
+    // Importing some classes
+    this.editor = __webpack_require__(/*! ./editor */ "./src/editor.js");
+    this.addons = __webpack_require__(/*! ./addons/manager */ "./src/addons/manager.js");
+    this.assets = __webpack_require__(/*! ./ui/assets */ "./src/ui/assets.js");
+    // Style sheet
+    this.styles = document.createElement('style');
+    this.styles.css = __webpack_require__(/*! ./ui/css */ "./src/ui/css.js");
+    // Making the ui componnents
+    this._modal = null;
+    this._menubutton = this.makeButton;
+  }
+
+  // Makers
+  get makeButton() {
+    const menuButton = new MenuBarButton('PawedLoader', null, false);
+    menuButton.node.addEventListener('click', (event) => this.menuButtonClicked(event));
+    return menuButton;
+  }
+  get makeModal() {
+    if (this._modal) this._modal.remove();
+    const modal = document.createElement('dialog');
+    document.body.appendChild(modal);
+    modal.setAttribute('paw-for', 'modal');
+    this.styles.textContent = this.styles.css.get();
+    modal.appendChild(this.styles);
+    this._modal = modal;
+    this.constructGUI();
+    return modal;
+  }
+  
+  // Setup
+  setupAllGUI() {
+    if (this._modal) {
+      try { this._modal.remove() } catch {};
+    }
+    this._modal = this.makeModal;
+    this.regenButton();
+    minilog.log('GUI Built');
+  }
+  async setup() {
+    this.editor.once('GUI_LOADED', () => {
+      if (this.editor.inEditor) this.editor.emit('SCRATCHBLOCKS', ScratchZ.Blocks);
+      __webpack_require__(/*! ./setup */ "./src/setup.js")();
+    });
+    this.assets.loadAssets().then(() => {
+      this.emit('ASSETS_LOADED');
+      minilog.log('Assets loaded!');
+      this.editor.on('OPENED/gui_events', () => this.regenButton());
+      this.editor.on('CLOSED/gui_events', () => this.regenButton());
+      this.setupAllGUI();
+    });
+  }
+
+  // Button stuff
+  regenButton() {
+    if (this._menubutton) try { this._menubutton.remove() } catch {};
+    this._menubutton = this.makeButton;
+    this._menubutton.show();
+  }
+
+  // Events
+  menuButtonClicked(event) {
+    this.show();
+  }
+
+  // GUI
+  constructGUI() {
+    this._modal.appendChild((__webpack_require__(/*! ./ui/index */ "./src/ui/index.js").ui)(this));
+  }
+
+  show() {
+    this._modal = this.makeModal;
+    this._modal.showModal();
+  }
+
+  hide() {
+    this._modal.innerHTML = '';
+    this._modal.remove();
+  }
+}
+module.exports = new GUI;
+
+
+/***/ }),
+
+/***/ "./src/setup.js":
+/*!**********************!*\
+  !*** ./src/setup.js ***!
+  \**********************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = function setup() {
+  (__webpack_require__(/*! ./utils/registerext */ "./src/utils/registerext.js").url)('data:application/javascript;base64,'+btoa('('+(function(Scratch) {
+    class PawedLoaderLabel {
+      getInfo() {
+        return {
+          id: 'AshimeePawedLoader',
+          name: 'PawedLoader',
+          blocks: [{
+            blockType: Scratch.BlockType.XML,
+            xml: '<sep gap="0" />'
+          }]
+        }
+      }
+    }
+    Scratch.extensions.register(new PawedLoaderLabel);
+    window.Scratch = Scratch;
+  }).toString()+')(Scratch);'));
+};
+
+/***/ }),
+
+/***/ "./src/ui/assets.js":
+/*!**************************!*\
+  !*** ./src/ui/assets.js ***!
+  \**************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const AssetsHandler = __webpack_require__(/*! ../classes/AssetHandler */ "./src/classes/AssetHandler.js");
+const GUIAssets = new AssetsHandler();
+async function loadAssets() {
+  await GUIAssets.saveGZ('icon', `H4sIAAAAAAAAA01SSW7bQBD8SoP3MqeX2QJJh9x9ygsCJpADWLERCaafn2rmEoDoITnTtfWc7h9X+fj1c//69nleihSJMSVaX+Tz9vr7fl5eHo/3L+u67/vT7k9vf66rlVJW9i2X0/Vyev/+eJEf5+W5d9ExNqjCHQOtScMIVFhBRw0xQ0+KAq1iXUIq1wY71iptSAvRJuFSZXSYyeT2EC1oDu3oxNWbxZQ6N+4QOAy1wAtmyIQ3ceNhQoJ4ynbq4ol/hSxqQkSe40byqmiIF6kqVmRSnElUREiv6C6tP0+CapCPKBVsCnSqa9AJoz+arFDnabpVbsKpHNEOs02UTOJOLszkcemalOZHpfOWhu3mNK0+NtWMgayF4fiQkdI4m5mRdE1P1tOlB4alKB3Ho6mOpvmTqohcDy1Uq5M+wUQcpD3qsv43Pq8MpbTNIuWS02dWDoTReGY5CVKdy7dJKQTh4r1sJXmIHdkGNox0TuJBF5Q29K6FezW/ZOiNCVNJ5jlBwYoooLXBkcA5rZls/NcpArwmYBZM2V8HvGY2kTZSIPEoOyVTUcl7k2HRm0TPkPhaWTWdrryseW0vfwE5q1mv9AIAAA==`, 'data:image/svg+xml;base64,');
+  GUIAssets.update('icon', (data) => btoa(data.replace('<svg ', '<svg style="fill:#ffffff;" ')));
+}
+GUIAssets.loadAssets = loadAssets;
+module.exports = GUIAssets;
+
+/***/ }),
+
+/***/ "./src/ui/css.js":
+/*!***********************!*\
+  !*** ./src/ui/css.js ***!
+  \***********************/
+/***/ ((module) => {
+
+let css = `
+/* css will go here */
+`;
+module.exports = {
+  get() {
+    return css;
+  },
+  set(styles) {
+    css = styles;
+  }
+};
+
+/***/ }),
+
+/***/ "./src/ui/index.js":
+/*!*************************!*\
+  !*** ./src/ui/index.js ***!
+  \*************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const State = __webpack_require__(/*! ../classes/State */ "./src/classes/State.js");
+const version = (__webpack_require__(/*! ../defs */ "./src/defs.js").version);
+class StateNode extends State {
+  constructor(nodeType, nodeFor, ...state) {
+    super(...state);
+    this.node = document.createElement(nodeType);
+    this.node.setAttribute('paw-for', nodeFor);
+  }
+}
+class UIHeader extends StateNode {
+  constructor(GUI) {
+    super('div', 'header');
+    this.GUI = GUI;
+    this.createHeader();
+  }
+  createHeader() {
+    const titleNode = document.createElement('div');
+    titleNode.appendChild(document.createTextNode('PawedLoader'));
+    titleNode.appendChild(document.createTextNode(`v${version}`));
+    titleNode.setAttribute('paw-for', 'header-title');
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'X';
+    closeButton.onclick = (event) => this.GUI.hide();
+    closeButton.setAttribute('paw-for', 'modal-close');
+    this.node.appendChild(titleNode);
+    this.node.appendChild(closeButton);
+  }
+}
+class UITabs extends StateNode {
+  constructor(body) {
+    super('div', 'tabs');
+    this.body = body;
+    this.register('TAB_CHANGED');
+    this.tabNumber = body.tabNumber;
+    this.tabPath = body.tabPath;
+    this.tabs = {'Extensions': ['Merged', 'Unmerged'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
+  }
+  tabClicked(tab, event) {
+    this.tabNumber = Number(tab.getAttribute('paw-tabNumber'));
+    this.tabPath = String(tab.getAttribute('paw-tabPath'));
+    this.emit('TAB_CHANGED', {tabNumber: this.tabNumber, tabPath: this.tabPath});
+  }
+  get generateTabs() {
+    let i = 0;
+    const sect = document.createElement('div');
+    sect.setAttribute('paw-for', 'tab-sect');
+    for (const entry of Object.entries(this.tabs)) {
+      const sectName = document.createTextNode(entry[0]);
+      const sectBody = document.createElement('div');
+      sectBody.setAttribute('paw-for', 'tab-sect-body');
+      const tabs = entry[1];
+      for (const tabText of tabs) {
+        i++;
+        const tab = document.createElement('button');
+        tab.textContent = tabText;
+        tab.setAttribute('paw-for', 'tab-button');
+        tab.setAttribute('paw-tabNumber', String(i));
+        tab.setAttribute('paw-tabPath', String(`${sectName.textContent}/${tabText}`));
+        tab.setAttribute('paw-active', String(this.tabNumber === i));
+        tab.onclick = (event) => this.tabClicked(tab, event);
+        sectBody.appendChild(tab);
+      }
+      const sectWrapper = document.createElement('div');
+      sectWrapper.setAttribute('paw-for', 'tab-sect-pop');
+      if (!entry[0].startsWith('N/A')) sectWrapper.appendChild(sectName);
+      sectWrapper.appendChild(sectBody);
+      sect.appendChild(sectWrapper);
+    }
+    return sect;
+  }
+  get getNode() {
+    this.node.innerHTML = '';
+    this.node.appendChild(this.generateTabs);
+    return this.node;
+  }
+}
+class UIBody extends StateNode {
+  constructor() {
+    super('div', 'body');
+    this.tabNumber = 1;
+    this.tabPath = 'Extensions/Merged';
+    this.tabs = new UITabs(this);
+    this.tabs.on('TAB_CHANGED', (tabData) => this.renderTab(tabData.tabNumber, tabData.tabPath));
+    this.renderTab(this.tabNumber, this.tabPath);
+  }
+  get getTab() {
+    const tabWrapper = document.createElement('div');
+    const allTabs = (__webpack_require__(/*! ./tabs */ "./src/ui/tabs.js").tabs);
+    const tabClass = allTabs[this.tabPath] ?? (__webpack_require__(/*! ./tabs */ "./src/ui/tabs.js").tabs)['N/A'];
+    const tab = new tabClass(this);
+    tabWrapper.appendChild(tab.getNode);
+    tabWrapper.setAttribute('paw-for', 'tab-render');
+    return tabWrapper;
+  }
+  renderTab(tabNumber, tabPath) {
+    this.tabNumber = tabNumber;
+    this.tabPath = tabPath;
+    this.node.innerHTML = '';
+    this.node.appendChild(this.tabs.getNode);
+    this.node.appendChild(this.getTab);
+  }
+}
+class UIFooter extends StateNode {
+  constructor() {
+    super('div', 'footer');
+  }
+}
+class UI extends StateNode {
+  constructor() {
+    super('paw', 'main');
+  }
+  ui(gui) {
+    const header = new UIHeader(gui);
+    const body = new UIBody;
+    const footer = new UIFooter;
+    this.node.innerHTML = '';
+    this.node.appendChild(header.node);
+    this.node.appendChild(body.node);
+    this.node.appendChild(footer.node);
+    return this.node;
+  }
+}
+module.exports = new UI;
+
+
+/***/ }),
+
+/***/ "./src/ui/tab/$Placeholder.js":
+/*!************************************!*\
+  !*** ./src/ui/tab/$Placeholder.js ***!
+  \************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Tab = __webpack_require__(/*! ../../classes/Tab */ "./src/classes/Tab.js");
+module.exports = class MyTab extends Tab {
+  constructor(body) {
+    super(body);
+    this.node = document.createElement('span');
+    this.node.textContent = `[TAB NOT IMPLEMENTED] ${body.tabNumber} : ${body.tabPath}`;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/ui/tab/Extensions_Merged.js":
+/*!*****************************************!*\
+  !*** ./src/ui/tab/Extensions_Merged.js ***!
+  \*****************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Tab = __webpack_require__(/*! ../../classes/Tab */ "./src/classes/Tab.js");
+module.exports = class MyTab extends Tab {
+  constructor(body) {
+    super(body);
+    this.node = document.createElement('span');
+    this.node.textContent = `${body.tabNumber} : ${body.tabPath}`;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/ui/tabs.js":
+/*!************************!*\
+  !*** ./src/ui/tabs.js ***!
+  \************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = {
+  tabs: {
+    'N/A': __webpack_require__(/*! ./tab/$Placeholder */ "./src/ui/tab/$Placeholder.js"),
+    'Extensions/Merged': __webpack_require__(/*! ./tab/Extensions_Merged */ "./src/ui/tab/Extensions_Merged.js"),
+  }
+}
+
+/***/ }),
+
+/***/ "./src/utils/index.js":
+/*!****************************!*\
+  !*** ./src/utils/index.js ***!
+  \****************************/
+/***/ ((module) => {
+
+function bufferToStream(arrayBuffer) {
+  return new ReadableStream({
+      start(controller) {
+          controller.enqueue(arrayBuffer);
+          controller.close();
+      }
+  });
+}
+
+function downloadArrayBuffer(arrayBuffer, fileName) {
+  const blob = new Blob([arrayBuffer]);
+  downloadBlob(blob, fileName);
+}
+function downloadBlob(blob, fileName = "download.x"){
+  const blobUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.setAttribute('download', fileName);
+  link.click();
+  window.URL.revokeObjectURL(blobUrl);
+}
+
+async function streamToBlob(stream, type) {
+  const reader = stream.getReader();
+  let done = false;
+  const data = [];
+
+  while (!done) {
+      const result = await reader.read();
+      done = result.done;
+      if (result.value) {
+          data.push(result.value);
+      }
+  }
+
+  return new Blob(data, { type });
+}
+
+function unixTimestampToDate(timestamp){
+  return new Date(timestamp * 1000);
+}
+
+function readString(dataView, offset, length) {
+  const str = [];
+  for (let i = 0; i < length; i++) {
+      str.push(String.fromCharCode(dataView.getUint8(offset + i)));
+  }
+  return str.join("");
+}
+
+function readTerminatedString(dataView, offset) {
+  const str = [];
+  let val;
+  let i = 0;
+
+  while (val != 0) {
+      val = dataView.getUint8(offset + i);
+      if (val != 0) {
+          str.push(String.fromCharCode(val));
+      }
+      i++
+  }
+  return str.join("");
+}
+
+function readBytes(dataView, offset, length) {
+  const bytes = [];
+  for (let i = 0; i < length; i++) {
+      bytes.push(dataView.getUint8(offset + i));
+  }
+  return bytes;
+}
+
+function readFlags(dataView, offset, flagLabels) {
+  const flags = {};
+
+  for (let i = 0; i < flagLabels.length; i++) {
+      const byte = dataView.getUint8(offset + Math.min(i / 8));
+      flags[flagLabels[i]] = (((1 << i) & byte) >> i) === 1;
+  }
+
+  return flags;
+}
+
+function base64ToArrayBuffer(base64) {
+  var binaryString = atob(base64);
+  var bytes = new Uint8Array(binaryString.length);
+  for (var i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+/**
+ * Calls hasOwnProperty without doing it on the main object.
+ * @param {Object} object The object to check for the key on.
+ * @param {String} key The key to check for.
+ */
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+
+const wait = (ms) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+module.exports = {
+  wait,
+  hasOwn,
+  // gzip stuff
+  readBytes,
+  readFlags,
+  readString,
+  readTerminatedString,
+  unixTimestampToDate,
+  bufferToStream,
+  downloadArrayBuffer,
+  downloadBlob,
+  streamToBlob,
+  base64ToArrayBuffer
+};
+
+/***/ }),
+
+/***/ "./src/utils/minilog.js":
+/*!******************************!*\
+  !*** ./src/utils/minilog.js ***!
+  \******************************/
+/***/ ((module) => {
+
+const prefix = 'PawLoader |';
+const log = (...a) => console.log(prefix, ...a);
+const warn = (...a) => console.warn(prefix, ...a);
+const error = (...a) => console.error(prefix, ...a);
+module.exports = { log, warn, error };
+
+/***/ }),
+
+/***/ "./src/utils/registerext.js":
+/*!**********************************!*\
+  !*** ./src/utils/registerext.js ***!
+  \**********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { vm, runtime } = __webpack_require__(/*! ../defs */ "./src/defs.js");
+module.exports = {
+  plugin: function RegisterExtensionFromClass(extension) {
+    var extensionInstance = new extension(runtime);
+    var serviceName = vm.extensionManager._registerInternalExtension(extensionInstance);
+    vm.extensionManager._loadedExtensions.set(extensionInstance.getInfo().id, serviceName);
+  },
+  url: async function RegisterExtensionFromURL(url) {
+    const extensionManager = vm.extensionManager, securityManager = extensionManager.securityManager;
+    const old = securityManager.getSandboxMode;
+    securityManager.getSandboxMode = function() {
+      return 'unsandboxed';
+    }
+    await extensionManager.loadExtensionURL(url);
+    securityManager.getSandboxMode = old;
+  }
+};
+
+/***/ }),
+
+/***/ "./src/utils/scratchz.js":
+/*!*******************************!*\
+  !*** ./src/utils/scratchz.js ***!
+  \*******************************/
+/***/ ((module) => {
+
+// I did make this, its just the only copy I have.
+class ScratchZ {constructor(){this.c_gbw="gui_blocks-wrapper",this.__rc="__reactContainer",this.__rii="__reactInternalInstance$";const t=window.Scratch||{};this.BlockType=t?.BlockType||{BOOLEAN:"Boolean",BUTTON:"button",LABEL:"label",COMMAND:"command",CONDITIONAL:"conditional",EVENT:"event",HAT:"hat",LOOP:"loop",REPORTER:"reporter",XML:"xml"},this.ArgumentType=t?.ArgumentType||{ANGLE:"angle",BOOLEAN:"Boolean",COLOR:"color",NUMBER:"number",STRING:"string",MATRIX:"matrix",NOTE:"note",IMAGE:"image",COSTUME:"costume",SOUND:"sound"},this.TargetType=t?.TargetType||{SPRITE:"sprite",STAGE:"stage"}}get on_projectPage(){return"object"==typeof this.ReduxState?.scratchGui}get on_homePage(){return"object"==typeof this.ReduxState?.splash}get on_profilePage(){return!!app?.profileModel?.getId?.()}get on_messagesPage(){return"string"==typeof this.ReduxState?.messages?.status?.clear&&!this.on_homePage}get gbWrapper(){return document.querySelector(`[class^="${this.c_gbw}"]`)}get containerKey(){return(Object.keys(app)||[]).find((t=>t.startsWith(this.__rc)))}get instanceKey(){return Object.keys(this.gbWrapper||{}).find((t=>t.startsWith(this.__rii)))}get ReduxStore(){return app[this.containerKey]?.child?.stateNode?.store}get ReduxState(){return this.ReduxStore?.getState?.()}get vm(){return window.vm||this.ReduxState?.scratchGui?.vm}get Blocks(){if("object"==typeof window?.ScratchBlocks)return window.ScratchBlocks;const t=Object.entries(this.gbWrapper||{}).find((t=>t[0].startsWith(this.__rii)))?.[1];if(!t)return;let e=t;for(;e&&!e?.stateNode?.ScratchBlocks;)e=e.child;return e.stateNode.ScratchBlocks}};
+const ScratchZinstance = new ScratchZ;
+let instance = ScratchZinstance;
+const useScratch = Scratch => {
+  instance = Scratch;
+  Scratch.ReduxStore = ScratchZinstance.ReduxStore;
+  Scratch.ReduxState = ScratchZinstance.ReduxState;
+  if (Scratch?.gui) Scratch.gui.getBlockly().then(Blockly => Scratch.Blocks = Blockly);
+};
+vm.on('CREATE_UNSANDBOXED_EXTENSION_API', Scratch => useScratch(Scratch));
+class getter {
+  get instance() {
+    return instance;
+  }
+}
+module.exports = new getter().instance;
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+const minilog = __webpack_require__(/*! ./utils/minilog */ "./src/utils/minilog.js");
+const vm = (__webpack_require__(/*! ./defs */ "./src/defs.js").vm);
+const GUI = __webpack_require__(/*! ./gui */ "./src/gui.js");
+GUI.setup();
+GUI.addons.load();
+minilog.log('Loaded.');
+
+vm.paw = GUI;
+vm.paw._loadRequire = () => {
+  if (vm.paw.require) return vm.paw.require;
+  try {
+    vm.paw.require = __webpack_require__;
+    return vm.paw.require;
+  } catch {
+    console.error('Failed to expose __webpack_require_');
+  };
+};
+
+})();
+
+/******/ })()
+;
 //# sourceMappingURL=bundle.js.map
 })();

@@ -32,11 +32,13 @@ class UITabs extends StateNode {
     this.body = body;
     this.register('TAB_CHANGED');
     this.tabNumber = body.tabNumber;
+    this.tabPath = body.tabPath;
     this.tabs = {'Extensions': ['Merged', 'Unmerged'], 'N/A~1': ['Packager', 'Addons', 'Themes']};
   }
   tabClicked(tab, event) {
     this.tabNumber = Number(tab.getAttribute('paw-tabNumber'));
-    this.emit('TAB_CHANGED', this.tabNumber);
+    this.tabPath = String(tab.getAttribute('paw-tabPath'));
+    this.emit('TAB_CHANGED', {tabNumber: this.tabNumber, tabPath: this.tabPath});
   }
   get generateTabs() {
     let i = 0;
@@ -53,6 +55,7 @@ class UITabs extends StateNode {
         tab.textContent = tabText;
         tab.setAttribute('paw-for', 'tab-button');
         tab.setAttribute('paw-tabNumber', String(i));
+        tab.setAttribute('paw-tabPath', String(`${sectName.textContent}/${tabText}`));
         tab.setAttribute('paw-active', String(this.tabNumber === i));
         tab.onclick = (event) => this.tabClicked(tab, event);
         sectBody.appendChild(tab);
@@ -75,18 +78,23 @@ class UIBody extends StateNode {
   constructor() {
     super('div', 'body');
     this.tabNumber = 1;
+    this.tabPath = 'Extensions/Merged';
     this.tabs = new UITabs(this);
-    this.tabs.on('TAB_CHANGED', tabNumber => this.renderTab(tabNumber));
-    this.renderTab(this.tabNumber);
+    this.tabs.on('TAB_CHANGED', (tabData) => this.renderTab(tabData.tabNumber, tabData.tabPath));
+    this.renderTab(this.tabNumber, this.tabPath);
   }
   get getTab() {
     const tabWrapper = document.createElement('div');
-    tabWrapper.appendChild(document.createTextNode(String(this.tabNumber)));
+    const allTabs = require('./tabs').tabs;
+    const tabClass = allTabs[this.tabPath] ?? require('./tabs').tabs['N/A'];
+    const tab = new tabClass(this);
+    tabWrapper.appendChild(tab.getNode);
     tabWrapper.setAttribute('paw-for', 'tab-render');
     return tabWrapper;
   }
-  renderTab(tabNumber) {
+  renderTab(tabNumber, tabPath) {
     this.tabNumber = tabNumber;
+    this.tabPath = tabPath;
     this.node.innerHTML = '';
     this.node.appendChild(this.tabs.getNode);
     this.node.appendChild(this.getTab);
