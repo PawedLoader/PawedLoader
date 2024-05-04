@@ -15,10 +15,10 @@ module.exports = class MyTab extends Tab {
     }, {
       name: 'Drago-Cuven',
       link: 'https://github.com/Drago-Cuven/',
-    },/* {
+    }, {
       name: 'ObviousAlexC',
       link: 'https://github.com/ObviousAlexC/',
-    }, {
+    },/*{
       name: 'SharkPool',
       link: 'https://www.youtube.com/@SharkPool_SP/',
     },*/];
