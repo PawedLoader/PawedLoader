@@ -2,12 +2,12 @@ module.exports = class AddonExporter {
   constructor() {
     this.addonIds = require('../export');
   }
-  get addons() {
+  importAddons() {
     const _addons = {};
-    addons.forEach(addonID => {
+    this.addonIds.forEach(addonID => {
       const addon = require(`../addon-${addonID}/main.js`);
       _addons[addonID] = addon;
     });
-    return addons;
+    this.addons = _addons;
   }
 }

@@ -2,7 +2,7 @@ const minilog = require('./utils/minilog');
 
 const EventEmitter = require('./classes/EventEmitter');
 const MenuBarButton = require('./classes/MenuBarButton');
-const ScratchZ = require('./utils/scratchz');
+const ScratchZ = require('./utils/index').scratchz;
 
 class GUI extends EventEmitter {
   constructor() {

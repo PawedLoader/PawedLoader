@@ -1,2 +1,2 @@
 // Addon files
-module.exports = [];
+module.exports = ['coloredinsertion'];

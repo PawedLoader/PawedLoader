@@ -48,7 +48,7 @@ module.exports = function patch(Scratch) {
         });
       });
     }
-    if (!Scratch?.gui) Scratch.gui = Scratch?.gui ?? {
+    Scratch.gui = {
       getBlockly,
       getBlocklyEagerly() {
         console.warn('Scratch.gui.getBlocklyEagerly is patched in and does not work!');
