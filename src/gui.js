@@ -30,8 +30,45 @@ class GUI extends EventEmitter {
   }
   get makeModal() {
     if (this._modal) this._modal.remove();
-    const modal = document.createElement('dialog');
-    document.body.appendChild(modal);
+
+    const background = document.createElement('div');
+    background.style.backgroundColor = 'var(--ui-modal-overlay)';
+    background.style.zIndex = "1500";
+    background.style.position = "absolute";
+    background.style.top = "0px";
+    background.style.left = "0px";
+    background.style.width = "100%";
+    background.style.height = "100%";
+    document.body.appendChild(background);
+
+    //Create the modal element and append it to the document
+    const modal = document.createElement('div');
+    modal.style.width = "auto";
+    modal.style.height = "60%";
+    modal.style.aspectRatio = "5/3";
+    modal.style.backgroundColor = 'var(--ui-modal-background)';
+    modal.style.position = "absolute";
+    modal.style.top = "50%";
+    modal.style.left = "50%";
+    modal.style.transform = "translate(-50%,-50%)";
+    modal.style.borderStyle = "solid";
+    modal.style.borderRadius = "0.5rem";
+    modal.style.borderWidth = "4px";
+    modal.style.borderColor = "var(--ui-white-transparent)";
+
+    modal.remove = () => {
+      document.body.removeChild(background);
+      this._modal = null;
+    }
+
+    //Add our functions to show and remove modals
+    modal.showModal = () => {
+      document.body.appendChild(background);
+    };
+
+    background.appendChild(modal);
+
+    //Set attributes and text contents
     modal.setAttribute('paw-for', 'modal');
     this.styles.textContent = this.styles.css.get();
     modal.appendChild(this.styles);

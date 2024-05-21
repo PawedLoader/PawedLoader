@@ -4,7 +4,7 @@ module.exports = function setup() {
       getInfo() {
         return {
           id: 'AshimeePawedLoader',
-          name: 'PawedLoader',
+          name: 'Pawed Loader',
           blocks: [{
             blockType: Scratch.BlockType.XML,
             xml: '<sep gap="0" />'
