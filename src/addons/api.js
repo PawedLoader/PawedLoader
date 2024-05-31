@@ -15,7 +15,7 @@ class AddonAPI {
     return (await this.IntermediaryScratch.gui.getBlockly());
   }
   async getVM() {
-    return (await this.IntermediaryScratch)
+    return (await this.IntermediaryScratch.vm);
   }
 }
 module.exports = AddonAPI;
