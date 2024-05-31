@@ -1,10 +1,12 @@
-// todo: this when garbo adds what i asked for.
-const addonAPI = require('../api');
-
 const addonID = 'AshimeeInsertionMarkerColors';
-module.exports = (function(addonData) {
+module.exports = (function() {
+
+  let addonAPI, addonData = {};
+
   // I suggested this addon to ScratchAddons as-well
-  function setup() {
+  function setup(api) {
+    addonAPI = api;
+    addonData = api.getData(addonID);
     addonAPI.getBlockly().then(Blockly => {
       const BlockSvgProto = Blockly.BlockSvg.prototype;
       const BSP_setColour = BlockSvgProto.setColour;
@@ -24,4 +26,4 @@ module.exports = (function(addonData) {
     /* DO NOT CHANGE */
     setup, data: addonData
   }
-})(addonAPI.getData(addonID));
+})();

@@ -1,11 +1,11 @@
 // todo: this when garbo adds what i asked for.
-const addonAPI = require('../api');
-
 const addonID = 'Ashimee';
-module.exports = (function(addonData) {
-  
-  function setup() {
-    // damn
+module.exports = (function() {
+
+  let addonAPI, addonData = {};
+  function setup(api) {
+    addonAPI = api;
+    addonData = api.getData(addonID);
   }
 
   return {
@@ -15,4 +15,4 @@ module.exports = (function(addonData) {
     /* DO NOT CHANGE */
     setup, data: addonData
   }
-})(addonAPI.getData(addonID));
+})();

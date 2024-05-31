@@ -6,7 +6,6 @@ module.exports = class PawedLoader {
       PawedLoader: this,
       ReduxStore: this.getRedux(),
       Scratch: require('./classes/IntermediaryScratch'),
-      addons: new (require('./addons/manager')),
       assets: require('./ui/assets'),
       db: require('./db'),
       minilog: require('./utils/minilog'),
@@ -17,6 +16,7 @@ module.exports = class PawedLoader {
       ...this.props,
       registerExt: new (require('./utils/registerext'))(this.props),
       editor: new (require('./editor'))(this.props),
+      addons: new (require('./addons/manager'))(this.props),
     };
     // The almighty GUI needs the editor so we do it last :p
     this.props.GUI = new (require('./gui'))(this.props);

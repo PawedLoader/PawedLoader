@@ -3,7 +3,7 @@ class Addons extends AddonExporter {
   constructor(props) {
     super(props);
     // Import our API and addons
-    this.api = new require('./api')(props);
+    this.api = new (require('./api'))(props);
     this.importAddons();
     // Load ALL the addons :clap:
     this.loadAll();
@@ -13,7 +13,7 @@ class Addons extends AddonExporter {
     if (!addonId) return false;
     console.log('Loading addon:', addonId);
     // Run the setup function for that addon (this is how it "loads")
-    this.addons[addonId].setup();
+    this.addons[addonId].setup(this.api);
   }
   loadAll() {
     // Just loop over all the addons and load them

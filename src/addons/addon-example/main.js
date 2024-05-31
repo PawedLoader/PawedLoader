@@ -1,11 +1,10 @@
-const addonAPI = require('../api');
-
 const addonID = 'AshimeesExample';
-module.exports = (function(addonData) {
+module.exports = (function() {
   
-  function setup() {
-    addonData['cool'] = true;
-    console.log('Wow!');
+  let addonAPI, addonData = {};
+  function setup(api) {
+    addonAPI = api;
+    addonData = api.getData(addonID);
   }
 
   return {
@@ -15,4 +14,4 @@ module.exports = (function(addonData) {
     /* DO NOT CHANGE */
     setup, data: addonData
   }
-})(addonAPI.getData(addonID));
+})();
