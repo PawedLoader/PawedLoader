@@ -13,11 +13,13 @@ module.exports = class AssetsHandler {
   }
   get(assetName) {
     const asset = this.assets[assetName];
+    // Read the assed data and append the prefix
     if (asset.data?.read) asset.data = asset.data.read();
     if (asset.prefix) return `${asset.prefix}${asset.data}`;
     return asset.data;
   }
   update(assetName, updator) {
+    // Set the asset data to our "updator" and if its a function its return value
     const asset = this.assets[assetName];
     if (typeof updator === 'function') {
       asset.data = updator(asset.data);

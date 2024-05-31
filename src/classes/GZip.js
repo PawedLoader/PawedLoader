@@ -9,6 +9,8 @@ const {
   downloadBlob,
   streamToBlob
 } = require('../utils');
+// I did not make this so I cannot comment it
+// For: alex
 module.exports = class GZip {
   #dataView;
   #index = 0;

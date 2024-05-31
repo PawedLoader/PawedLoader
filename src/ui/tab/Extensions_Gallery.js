@@ -1,6 +1,7 @@
 const Tab = require('../../classes/Tab');
 const Gallery = require('../../classes/Gallery');
 
+// For alex: I will comment this when the CSS gets fixed
 module.exports = class MyTab extends Tab {
   constructor(props) {
     super(props);

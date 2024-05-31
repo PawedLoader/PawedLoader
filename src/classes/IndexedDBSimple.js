@@ -1,6 +1,7 @@
 // https://web.archive.org/web/20240503173045/https://raw.githubusercontent.com/Mistium/extensions.mistium/main/featured/IndexedDB.js
 // License was not provided in that version,
 // Intern im making it MIT for this project.
+// (I did not make this Alex, And I dont understand IndexedDB so uh I cant comment it)
 module.exports = class IndexedDBsimple {
   constructor() {
     this.dbName = 'PawedLoader';

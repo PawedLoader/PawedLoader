@@ -1,3 +1,7 @@
+// GZIP Functions //
+
+// I did not actually make this code so I dont understand it :thumbs_up:
+// Sorry alex, all I can say is that its used for GZIP decompression
 function bufferToStream(arrayBuffer) {
   return new ReadableStream({
       start(controller) {
@@ -91,13 +95,15 @@ function base64ToArrayBuffer(base64) {
   return bytes.buffer;
 }
 
+// End GZIP Functions //
+
+// I should not have to explain these
 /**
  * Calls hasOwnProperty without doing it on the main object.
  * @param {Object} object The object to check for the key on.
  * @param {String} key The key to check for.
  */
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
-
 const wait = (ms) => {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, ms);

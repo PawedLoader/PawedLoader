@@ -1,3 +1,4 @@
+// Export the tabs we define in index.js
 module.exports = {
   tabs: {
     'N-A': require('./tab/$Placeholder'),

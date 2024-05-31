@@ -1,9 +1,13 @@
+// (Basically a limited version of the Scratch object, with some more features)
 class AddonAPI {
-  constructor() {
-    this.IntermediaryScratch = {gui:{}};
-    require('../patches/Scratch_gui_getBlockly')(this.IntermediaryScratch);
+  constructor(props) {
+    this.props = props;
+    // Fetch IntermediaryScratch from the props
+    // Props is a long chain so yeah-
+    this.IntermediaryScratch = props.Scratch;
   }
   getData(addonID) {
+    // Todo: let addons store persistant data
     return {};
   }
   // Internal stuff for addons
@@ -14,4 +18,4 @@ class AddonAPI {
     return (await this.IntermediaryScratch)
   }
 }
-module.exports = new AddonAPI;
+module.exports = AddonAPI;

@@ -1,3 +1,4 @@
+// Just a placeholder tab
 const Tab = require('../../classes/Tab');
 module.exports = class MyTab extends Tab {
   constructor(props) {

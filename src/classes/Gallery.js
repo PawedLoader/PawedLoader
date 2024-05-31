@@ -1,5 +1,6 @@
 const Tab = require('./Tab');
 
+// Ill comment this when alex fixes the Css :shades:
 module.exports = class Gallery extends Tab {
   constructor(body, galleryName) {
     super(body);

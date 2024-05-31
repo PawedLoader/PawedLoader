@@ -1,5 +1,6 @@
 module.exports = class AddonExporter {
-  constructor() {
+  constructor(props) {
+    this.props = props;
     this.addonIds = require('../export');
   }
   importAddons() {
