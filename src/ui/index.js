@@ -75,8 +75,9 @@ class UITabs extends StateNode {
   }
 }
 class UIBody extends StateNode {
-  constructor() {
+  constructor(props) {
     super('div', 'body');
+    this.props = props;
     this.tabNumber = 1;
     this.tabPath = 'Extensions/Merged';
     this.tabs = new UITabs(this);
@@ -87,7 +88,7 @@ class UIBody extends StateNode {
     const tabWrapper = document.createElement('div');
     const allTabs = require('./tabs').tabs;
     const tabClass = allTabs[this.tabPath] ?? require('./tabs').tabs['N-A'];
-    const tab = new tabClass(this);
+    const tab = new tabClass({ body: this });
     tabWrapper.appendChild(tab.getNode);
     tabWrapper.setAttribute('paw-for', 'tab-render');
     return tabWrapper;
@@ -101,8 +102,9 @@ class UIBody extends StateNode {
   }
 }
 class UIFooter extends StateNode {
-  constructor() {
+  constructor(props) {
     super('div', 'footer');
+    this.props = props;
   }
 }
 class UI extends StateNode {
@@ -112,7 +114,7 @@ class UI extends StateNode {
   ui(gui) {
     const header = new UIHeader(gui);
     this.header = header;
-    const body = new UIBody;
+    const body = new UIBody(gui);
     this.body = body;
     const footer = new UIFooter;
     this.footer = footer;

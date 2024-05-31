@@ -84,16 +84,15 @@ class GUI extends EventEmitter {
     }
     this._modal = this.makeModal;
     this.regenButton();
-    minilog.log('GUI Built');
+    this.minilog.log('GUI Built');
   }
   async setup() {
     this.editor.once('GUI_LOADED', async () => {
       if (this.editor.inEditor) this.editor.emit('SCRATCHBLOCKS', await this.Scratch.gui.getBlockly());
-      require('./setup')();
     });
     this.assets.loadAssets().then(() => {
       this.emit('ASSETS_LOADED');
-      minilog.log('Assets loaded!');
+      this.minilog.log('Assets loaded!');
       this.editor.on('OPENED/gui_events', () => this.regenButton());
       this.editor.on('CLOSED/gui_events', () => this.regenButton());
       this.setupAllGUI();

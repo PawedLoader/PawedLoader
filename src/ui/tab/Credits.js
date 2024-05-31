@@ -2,8 +2,9 @@ const hasOwn = require('../../utils/index').hasOwn;
 const Tab = require('../../classes/Tab');
 
 module.exports = class MyTab extends Tab {
-  constructor(body) {
-    super(body);
+  constructor(props) {
+    super(props);
+    const body = props.body;
     this.node = document.createElement('span');
     this.node.textContent = `${body.tabNumber} : ${body.tabPath}`;
     // Please keep this list in alphabetical order please.

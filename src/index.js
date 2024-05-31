@@ -1,6 +1,7 @@
 setTimeout(() => {
   const PawedLoader = new (require('./setup'));
-  const { minilog, GUI, vm } = PawedLoader.props;
+  const { minilog, GUI, Scratch } = PawedLoader.props;
+  const vm = Scratch.vm;
 
   // Exposing Scratch.gui.getBlockly patch.
   GUI.constructor.prototype._patchScratchGUI = require('./patches/Scratch_gui_getBlockly');

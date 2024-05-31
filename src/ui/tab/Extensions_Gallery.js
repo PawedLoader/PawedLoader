@@ -1,11 +1,13 @@
 const Tab = require('../../classes/Tab');
 const Gallery = require('../../classes/Gallery');
-const DB = require('../../db');
 
 module.exports = class MyTab extends Tab {
-  constructor(body) {
-    super(body);
+  constructor(props) {
+    super(props);
+    const body = props.body;
+    this.DB = body.props.DB;
     this.node = document.createElement('span');
+    return this.node; // for now due to alex accidentilly breaking it with his CSS :((
     this._refreshingGallerys = false;
     this._deleteGallery(true);
     this.galleryURLS = {
@@ -35,6 +37,7 @@ module.exports = class MyTab extends Tab {
     }
   }
   async _makeGallerys() {
+    this._refreshingGallerys = this._refreshingGallerys || !await this.DB.readFromDatabase('gallerysJSON');
     this._deleteGallery(true);
     for (const galleryName of Object.keys(this.galleryURLS)) {
       const gallery = await this._refreshGallery(galleryName, this._refreshingGallerys);
@@ -46,6 +49,7 @@ module.exports = class MyTab extends Tab {
     this.node.appendChild(this.gallerys);
   }
   async _refreshGallery(galleryName, refetch) {
+    const DB = this.DB;
     const api = this.galleryURLS[galleryName];
     let galleryResponse = '';
     if (refetch) await (new Promise(async (resolve, reject) => {
@@ -96,7 +100,8 @@ module.exports = class MyTab extends Tab {
     return gallery;
   }
   get getNode() {
-    this.node.innerHTML = '';
+    this.node.innerHTML = 'WIP';
+    return this.node; // for now due to alex accidentilly breaking it with his CSS :((
     this._deleteGallery(false);
     this._makeGallerys();
     return this.node;
