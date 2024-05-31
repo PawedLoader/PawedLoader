@@ -1,9 +1,11 @@
 const EventEmitter = require('./classes/EventEmitter');
-const { ReduxStore, ScratchZ } = require('./defs');
 
 class Editor extends EventEmitter {
-  constructor() {
+  constructor(props) {
     super();
+    // Loading in the props
+    this.props = props;
+    this.ReduxStore = props.ReduxStore;
     // Setup
     this._wasInEditor = this.inEditor;
     this._loadingGUI = !this.GUIavailable;
@@ -46,4 +48,4 @@ class Editor extends EventEmitter {
     return state.scratchGui.projectState;
   }
 }
-module.exports = new Editor;
+module.exports = Editor;

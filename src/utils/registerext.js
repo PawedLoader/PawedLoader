@@ -1,12 +1,15 @@
-const { vm, runtime } = require('../defs');
-module.exports = {
-  plugin: function RegisterExtensionFromClass(extension) {
-    var extensionInstance = new extension(runtime);
-    var serviceName = vm.extensionManager._registerInternalExtension(extensionInstance);
-    vm.extensionManager._loadedExtensions.set(extensionInstance.getInfo().id, serviceName);
-  },
-  url: async function RegisterExtensionFromURL(url) {
-    const extensionManager = vm.extensionManager, securityManager = extensionManager.securityManager;
+class ExtensionRegisterer {
+  constructor(props) {
+    this.props = props;
+    this.vm = props.vm;
+  }
+  async plugin(extension) {
+    const extensionInstance = new extension(runtime);
+    const serviceName = vm.extensionManager._registerInternalExtension(extensionInstance);
+    this.vm.extensionManager._loadedExtensions.set(extensionInstance.getInfo().id, serviceName);
+  }
+  async url(url) {
+    const extensionManager = this.vm.extensionManager, securityManager = extensionManager.securityManager;
     const old = securityManager.getSandboxMode;
     securityManager.getSandboxMode = function() {
       return 'unsandboxed';
@@ -14,4 +17,5 @@ module.exports = {
     await extensionManager.loadExtensionURL(url);
     securityManager.getSandboxMode = old;
   }
-};
+}
+module.exports = ExtensionRegisterer;

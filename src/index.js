@@ -1,7 +1,6 @@
 setTimeout(() => {
-  const minilog = require('./utils/minilog');
-  const vm = require('./defs').vm;
-  const GUI = require('./gui');
+  const PawedLoader = new (require('./setup'));
+  const { minilog, GUI, vm } = PawedLoader.props;
 
   // Exposing Scratch.gui.getBlockly patch.
   GUI.constructor.prototype._patchScratchGUI = require('./patches/Scratch_gui_getBlockly');
@@ -10,7 +9,7 @@ setTimeout(() => {
   GUI.addons.load();
   minilog.log('Loaded.');
 
-  vm.paw = GUI;
+  vm.paw = PawedLoader;
   vm.paw._loadRequire = () => {
     if (vm.paw.require) return vm.paw.require;
     try {

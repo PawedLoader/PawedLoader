@@ -1,19 +1,16 @@
-module.exports = function setup() {
-  require('./utils/registerext').url('data:application/javascript;base64,'+btoa('('+(function(Scratch) {
-    class PawedLoaderLabel {
-      getInfo() {
-        return {
-          id: 'AshimeePawedLoader',
-          name: 'Pawed Loader',
-          blocks: [{
-            blockType: Scratch.BlockType.XML,
-            xml: '<sep gap="0" />'
-          }]
-        }
-      }
-    }
-    Scratch.extensions.register(new PawedLoaderLabel);
-    window.Scratch = Scratch;
-    vm.paw._patchScratchGUI(Scratch);
-  }).toString()+')(Scratch);'));
-};
+module.exports = class PawedLoader {
+  constructor() {
+    this.props = {
+      PawedLoader: this,
+      Scratch: require('./classes/IntermediaryScratch'),
+      editor: new (require('./editor')),
+      addons: new (require('./addons/manager')),
+      assets: require('./ui/assets'),
+      db: require('./db'),
+      minilog: require('./utils/minilog'),
+      defs: require('./defs'),
+      registerExt: new (require('./utils/registerext'))(this.props),
+      GUI: new (require('./gui'))(this.props),
+    };
+  }
+}

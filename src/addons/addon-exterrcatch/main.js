@@ -7,7 +7,6 @@ module.exports = (function(addonData) {
   function setup() {
     // damn
   }
-  function main() {}
 
   return {
     name: 'Extension loading error catcher.', id: addonID,

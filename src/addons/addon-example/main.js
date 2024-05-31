@@ -7,7 +7,6 @@ module.exports = (function(addonData) {
     addonData['cool'] = true;
     console.log('Wow!');
   }
-  function main() {}
 
   return {
     name: 'Example - Mhm', id: addonID,

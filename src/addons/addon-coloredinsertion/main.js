@@ -16,7 +16,6 @@ module.exports = (function(addonData) {
       }
     });
   }
-  function main() {}
 
   return {
     name: 'Colored insertion markers.', id: addonID,

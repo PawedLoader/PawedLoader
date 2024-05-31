@@ -18,4 +18,4 @@ class Addons extends AddonExporter {
     });
   }
 }
-module.exports = new Addons;
+module.exports = Addons;

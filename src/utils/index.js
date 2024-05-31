@@ -105,8 +105,6 @@ const wait = (ms) => {
 }
 
 module.exports = {
-  // dupe exports
-  scratchz: require('./scratchz'),
   // other exports
   wait,
   hasOwn,

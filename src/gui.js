@@ -1,19 +1,19 @@
-const minilog = require('./utils/minilog');
-
 const EventEmitter = require('./classes/EventEmitter');
 const MenuBarButton = require('./classes/MenuBarButton');
-const ScratchZ = require('./utils/index').scratchz;
 
 class GUI extends EventEmitter {
-  constructor() {
+  constructor(props) {
     super();
     // Setup events
     this.register('ASSETS_LOADED');
     // Importing some classes
-    this.editor = require('./editor');
-    this.addons = require('./addons/manager');
-    this.assets = require('./ui/assets');
-    this.DB = require('./db');
+    this.props = props;
+    this.minilog = props.minilog;
+    this.editor = props.editor;
+    this.addons = props.addons;
+    this.assets = props.assets;
+    this.DB = props.db;
+    this.Scratch = props.Scratch;
     // Style sheet
     this.styles = document.createElement('style');
     this.styles.css = require('./ui/css');
@@ -87,8 +87,8 @@ class GUI extends EventEmitter {
     minilog.log('GUI Built');
   }
   async setup() {
-    this.editor.once('GUI_LOADED', () => {
-      if (this.editor.inEditor) this.editor.emit('SCRATCHBLOCKS', ScratchZ.Blocks);
+    this.editor.once('GUI_LOADED', async () => {
+      if (this.editor.inEditor) this.editor.emit('SCRATCHBLOCKS', await this.Scratch.gui.getBlockly());
       require('./setup')();
     });
     this.assets.loadAssets().then(() => {
@@ -128,4 +128,4 @@ class GUI extends EventEmitter {
     this._modal.remove();
   }
 }
-module.exports = new GUI;
+module.exports = GUI;
