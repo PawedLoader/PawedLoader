@@ -1,11 +1,13 @@
 module.exports = class PawedLoader {
-  constructor() {
+  async $constructor() {
     // We gotta setup some exports that we will pass around
     // Its done here as to not run the same code multiple times (webpack issue)
+    const Scratch = new (require('./classes/IntermediaryScratch'));
+    await Scratch.setup();
     this.props = {
       PawedLoader: this,
       ReduxStore: this.getRedux(),
-      Scratch: require('./classes/IntermediaryScratch'),
+      Scratch,
       assets: require('./ui/assets'),
       db: require('./db'),
       minilog: require('./utils/minilog'),

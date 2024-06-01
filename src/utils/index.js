@@ -104,6 +104,10 @@ function base64ToArrayBuffer(base64) {
  * @param {String} key The key to check for.
  */
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+const hasOwnMany = (object, ...keys) => {
+  for (const key of keys) if (!hasOwn(object, key)) return false;
+  return true;
+};
 const wait = (ms) => {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, ms);
@@ -114,6 +118,7 @@ module.exports = {
   // other exports
   wait,
   hasOwn,
+  hasOwnMany,
   // gzip stuff
   readBytes,
   readFlags,

@@ -2,7 +2,7 @@ class ExtensionRegisterer {
   constructor(props) {
     this.props = props;
     // Get the VM from our props
-    this.vm = props.vm;
+    this.vm = props.Scratch.vm;
   }
   async plugin(extension) {
     // Create the extension instance (pass runtime as per the usual)
