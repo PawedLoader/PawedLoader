@@ -1,5 +1,5 @@
 const GZip = require('../classes/GZip');
-const base64ToArrayBuffer = require('../utils/index').base64ToArrayBuffer;
+const base64ToArrayBuffer = require('../utils').base64ToArrayBuffer;
 
 module.exports = class AssetsHandler {
   constructor() {

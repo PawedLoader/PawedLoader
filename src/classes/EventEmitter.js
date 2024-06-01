@@ -1,4 +1,4 @@
-const hasOwn = require('../utils/index').hasOwn;
+const hasOwn = require('../utils').hasOwn;
 
 class EventEmitter extends EventTarget {
   constructor() {
