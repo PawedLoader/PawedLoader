@@ -130,7 +130,91 @@ class IntermediaryScratch {
           return this.props.registerExt.plugin(extension);
         }
       },
+    };
+    if (!vm.securityManager) {
+      vm.securityManager = new Proxy({}, {get(){return ()=>true}});
     }
+    // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/tw-unsandboxed-extension-runner.js
+    const parseURL = url => {
+      try {
+        return new URL(url, location.href);
+      } catch (e) {
+        return null;
+      }
+    };
+    this.canFetch = async url => {
+      const parsed = parseURL(url);
+      if (!parsed) {
+        return false;
+      }
+      // Always allow protocols that don't involve a remote request.
+      if (parsed.protocol === 'blob:' || parsed.protocol === 'data:') {
+        return true;
+      }
+      return vm.securityManager.canFetch(parsed.href);
+    };
+    this.canOpenWindow = async url => {
+      const parsed = parseURL(url);
+      if (!parsed) {
+        return false;
+      }
+      // Always reject protocols that would allow code execution.
+      // eslint-disable-next-line no-script-url
+      if (parsed.protocol === 'javascript:') {
+        return false;
+      }
+      return vm.securityManager.canOpenWindow(parsed.href);
+    };
+    this.canRedirect = async url => {
+      const parsed = parseURL(url);
+      if (!parsed) {
+        return false;
+      }
+      // Always reject protocols that would allow code execution.
+      // eslint-disable-next-line no-script-url
+      if (parsed.protocol === 'javascript:') {
+        return false;
+      }
+      return vm.securityManager.canRedirect(parsed.href);
+    };
+    this.canRecordAudio = async () => vm.securityManager.canRecordAudio();
+    this.canRecordVideo = async () => vm.securityManager.canRecordVideo();
+    this.canReadClipboard = async () => vm.securityManager.canReadClipboard();
+    this.canNotify = async () => vm.securityManager.canNotify();
+    this.canGeolocate = async () => vm.securityManager.canGeolocate();
+    this.canEmbed = async url => {
+      const parsed = parseURL(url);
+      if (!parsed) {
+        return false;
+      }
+      return vm.securityManager.canEmbed(parsed.href);
+    };
+    this.fetch = async (url, options) => {
+      const actualURL = url instanceof Request ? url.url : url;
+      const staticFetchResult = staticFetch(url);
+      if (staticFetchResult) {
+        return staticFetchResult;
+      }
+      if (!await this.canFetch(actualURL)) {
+        throw new Error(`Permission to fetch ${actualURL} rejected.`);
+      }
+      return fetch(url, options);
+    };
+    this.openWindow = async (url, features) => {
+      if (!await this.canOpenWindow(url)) {
+        throw new Error(`Permission to open tab ${url} rejected.`);
+      }
+      // Use noreferrer to prevent new tab from accessing `window.opener`
+      const baseFeatures = 'noreferrer';
+      features = features ? `${baseFeatures},${features}` : baseFeatures;
+      return window.open(url, '_blank', features);
+    };
+    this.redirect = async url => {
+      if (!await this.canRedirect(url)) {
+        throw new Error(`Permission to redirect to ${url} rejected.`);
+      }
+      location.href = url;
+    };
   }
 }
 // Export the Scratch* class
