@@ -112,6 +112,8 @@ class IntermediaryScratch {
     this.extensions = {
       unsandboxed: true,
       register: async (extension) => {
+        // For NOW we will yell at the user if they try to use this :cri:
+        throw new Error('API not implemented');
         // Check if we have a creation event :yawn:
         // (we need to hack it)
         if (vm._events['CREATE_UNSANDBOXED_EXTENSION_API']) {
