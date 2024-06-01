@@ -132,7 +132,50 @@ class IntermediaryScratch {
       },
     };
     if (!vm.securityManager) {
-      vm.securityManager = new Proxy({}, {get(){return ()=>true}});
+      // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/tw-security-manager.js
+      vm.securityManager = new (class SecurityManager {
+        getSandboxMode (extensionURL) {
+          // Default to worker for Scratch compatibility
+          return Promise.resolve('unsandboxed');
+        }
+        canLoadExtensionFromProject (extensionURL) {
+            // Default to false for security
+            return Promise.resolve(false);
+        }
+        rewriteExtensionURL (extensionURL) {
+            return Promise.resolve(extensionURL);
+        }
+        canFetch (resourceURL) {
+            // By default, allow any requests.
+            return Promise.resolve(true);
+        }
+        canOpenWindow (websiteURL) {
+            // By default, allow all.
+            return Promise.resolve(true);
+        }
+        canRedirect (websiteURL) {
+            // By default, allow all.
+            return Promise.resolve(true);
+        }
+        canRecordAudio () {
+            return Promise.resolve(true);
+        }
+        canRecordVideo () {
+            return Promise.resolve(true);
+        }
+        canReadClipboard () {
+            return Promise.resolve(true);
+        }
+        canNotify () {
+            return Promise.resolve(true);
+        }
+        canGeolocate () {
+            return Promise.resolve(true);
+        }
+        canEmbed (documentURL) {
+          return Promise.resolve(true);
+        }
+      });
     }
     // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/tw-unsandboxed-extension-runner.js
     const parseURL = url => {
