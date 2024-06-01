@@ -25,7 +25,7 @@ class MenuBarButton {
     const newButton = document.querySelector('div[class^=menu-bar_menu-bar-item]').cloneNode(true);
     this.node = newButton;
     this.isDropdown = isDropdown ?? false;
-    this.image = image ?? undefined;
+    this.image = image ?? false;
     // Add the button to the navbar and hide it
     fileGroupBar.appendChild(newButton);
     this.hide();

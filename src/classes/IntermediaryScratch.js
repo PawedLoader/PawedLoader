@@ -1,8 +1,6 @@
 const patchGetBlockly = require('../patches/Scratch_gui_getBlockly');
 const hasOwnMany = require('../utils').hasOwnMany;
 
-let ScratchExport;
-
 // Simple function for overriding Function.prototype[proto] for its this arg
 // Returns the this arg when all of hasArgs exist on the this arg
 // Its weird ik :P
