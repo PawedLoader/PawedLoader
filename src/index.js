@@ -34,7 +34,7 @@ setTimeout(() => {
     minilog.log('Time taken: ', Date.now()-LOAD_TIME);
   }).catch((err) => {
     const minilog = require('./utils/minilog');
-    minilog.error('Failed to load.');
+    minilog.error('Failed to load.', err);
     minilog.log('Time taken: ', Date.now()-LOAD_TIME);
   });
 }, 2500);
