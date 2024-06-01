@@ -18,11 +18,12 @@ module.exports = class MyTab extends Tab {
     }, {
       name: 'Drago-Cuven',
       link: 'https://github.com/Drago-Cuven/',
-    }, {
+    }];
+    this.contributers = [{
       name: 'ObviousAlexC',
       link: 'https://github.com/ObviousAlexC/',
       secret: 'Pen+ guy :>',
-    }];
+    }]
   }
   constructNode() {
     // Reset the HTML for the node as we remake it when the tab is opened
@@ -31,6 +32,10 @@ module.exports = class MyTab extends Tab {
     const tabTitle = document.createElement('h3');
     tabTitle.textContent = 'CREDITS';
     tabTitle.setAttribute('paw-for', 'credits-title');
+    // Create the tab title and set it to "CREDITS"
+    const tabSecContributors = document.createElement('h5');
+    tabSecContributors.textContent = 'Contributers';
+    tabSecContributors.setAttribute('paw-for', 'credits-contribs-title');
     // Create a div to hold all! of our credits
     const creditsHolder = document.createElement('div');
     creditsHolder.setAttribute('paw-for', 'credits-holder');
@@ -49,8 +54,28 @@ module.exports = class MyTab extends Tab {
       // Add the userNode to the creditsHolder so you can see it
       creditsHolder.appendChild(userNode);
     }
+    // Create a div to hold all! of our contributers
+    const contributersHolder = document.createElement('div');
+    contributersHolder.setAttribute('paw-for', 'contributers-holder');
+    // Convert all the users in the "contributers" array to anchor tags and add then to the contributersHolder
+    for (const user of this.contributers) {
+      // Make the user their own div cause why not
+      const userNode = document.createElement('div');
+      userNode.setAttribute('paw-for', 'contributers-user');
+      // Create the anchor tag and add it to the userNode div
+      const username = document.createElement('a');
+      username.textContent = user.name;
+      username.href = user.link;
+      userNode.appendChild(username);
+      // Ooo secret (just some hover text :thumbs_up:)
+      if (hasOwn(user, 'secret')) userNode.title = user.secret;
+      // Add the userNode to the contributersHolder so you can see it
+      contributersHolder.appendChild(userNode);
+    }
     // Adding all the stuff we just made to the node so we can see it
     this.node.appendChild(tabTitle);
     this.node.appendChild(creditsHolder);
+    this.node.appendChild(tabSecContributors);
+    this.node.appendChild(contributersHolder);
   }
 }

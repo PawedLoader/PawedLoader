@@ -1,0 +1,43 @@
+/* Main modal styling */
+div[paw-for="modal-bg"] {
+  width: 100%;
+  height: 100%;
+  background: var(--ui-modal-overlay);
+  position: absolute;
+  z-index: 1500;
+  top: 0px;
+  left: 0px;
+}
+div[paw-for="modal"] {
+  width: auto;
+  height: 75%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-attachment: local, local, local, scroll;
+  aspect-ratio: 5/3;
+  background: var(--ui-modal-background);
+  border-style: solid;
+  border-radius: 0.5rem;
+  border-width: 4px;
+  border-color: var(--ui-white-transparent);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+paw {
+  width: fit-content;
+  height: auto;
+}
+div[paw-for="modal"]::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+div[paw-for="modal"]::-webkit-scrollbar-track {
+  border-radius: 20px;
+  background-color: var(--ui-modal-overlay);
+}
+div[paw-for="modal"]::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: var(--menu-bar-background);
+}
