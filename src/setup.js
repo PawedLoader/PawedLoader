@@ -1,21 +1,12 @@
-!function letsTrickWebpack() {
-  const require = () => {}, __webpack_require__ = () => {};
-  require('./ui/assets');
-}
 module.exports = class PawedLoader {
   async $constructor() {
-    // We gotta setup some exports that we will pass around
-    // Its done here as to not run the same code multiple times (webpack issue)
-    const Scratch = new (require('./classes/IntermediaryScratch'));
-    await Scratch.setup();
     // Caching
     const self = this;
     this.cache = {};
-    // Some props to share (Hopefully lazilly loaded w/ cache)
+    // Some props to share
     this.props = {
       PawedLoader: this,
       ReduxStore: this.getRedux(),
-      Scratch,
       get assets() {
         return (self.cache['./ui/assets']=self.cache['./ui/assets']??require('./ui/assets'));
       },
@@ -42,6 +33,10 @@ module.exports = class PawedLoader {
         return (self.cache['./addons/manager']=self.cache['./addons/manager']??new (require('./addons/manager'))(self.props));
       },
     };
+    // we setup Scratch all the way over here as to not miss any exports that it needs
+    // we dont have to worry about anything requiring it because they are lazilly loaded
+    this.props.Scratch = new (require('./classes/IntermediaryScratch'))(self.props);
+    this.props.Scratch.setup();
     // The almighty GUI needs the editor so we do it last :p
     this.props.GUI = new (require('./gui'))(this.props);
   }

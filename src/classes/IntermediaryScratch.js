@@ -38,7 +38,8 @@ const BindFnForArgs = (proto, ...hasArgs) => {
 };
 
 class IntermediaryScratch {
-  constructor() {
+  constructor(props) {
+    this.props = props;
     this.$internal = {BindFnForArgs, loadVM: function() {
       return new Promise(async (resolve, reject) => {
         // Faster than wasting time if its already found by another script
@@ -48,10 +49,52 @@ class IntermediaryScratch {
         else resolve(await BindFnForArgs('bind', 'editingTarget', 'runtime'));
       });
     }};
-    // Setup som default values
-    this.gui = {}, this.vm = null, this.renderer = null;
+    // Setup some default values
+    this.gui = {}, this.vm = null, this.renderer = null, this.extensions = {
+      unsandboxed: true,
+      register() {throw new Error('Not implemented yet.')},
+    };
     // Patch the this.gui object so that we can use Scratch.gui.getBlockly without issues
     patchGetBlockly(this);
+    // The basics
+    this.BlockType = {
+      // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/block-type.js
+      XML: 'xml',
+      LABEL: 'label',
+      COMMAND: 'command',
+      REPORTER: 'reporter',
+      BOOLEAN: 'Boolean',
+      HAT: 'hat',
+      EVENT: 'event',
+      CONDITIONAL: 'conditional',
+      LOOP: 'loop',
+      BUTTON: 'button',
+      // INLINE: 'inline',
+    };
+    this.ArgumentType = {
+      // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/argument-type.js
+      STRING: 'string',
+      NUMBER: 'number',
+      BOOLEAN: 'Boolean',
+      ANGLE: 'angle',
+      MATRIX: 'matrix',
+      COLOR: 'color',
+      NOTE: 'note',
+      IMAGE: 'image',
+      COSTUME: 'costume',
+      SOUND: 'sound',
+      // NULL: null,
+    };
+    this.TargetType = {
+      // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/target-type.js
+      STAGE: 'stage',
+      SPRITE: 'sprite',
+    };
+    this.ReporterScope = {
+      // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/reporter-scope.js
+      GLOBAL: 'global',
+      TARGET: 'target',
+    };
   }
   async setup() {
     // Load the VM
@@ -64,8 +107,30 @@ class IntermediaryScratch {
     // When the API is created (the REAL Scratch object) modify it and update our export
     vm.on('CREATE_UNSANDBOXED_EXTENSION_API', Scratch => {
       patchGetBlockly(Scratch);
-      ScratchExport = Scratch;
     });
+    // The registrar
+    this.extensions = {
+      unsandboxed: true,
+      register: async (extension) => {
+        // Check if we have a creation event :yawn:
+        // (we need to hack it)
+        if (vm._events['CREATE_UNSANDBOXED_EXTENSION_API']) {
+          // Use an event to register the extension we want before the dummy extension
+          vm.once('CREATE_UNSANDBOXED_EXTENSION_API', Scratch => {
+            // Now we register the ACTUAL extension
+            Scratch.extensions.register(extension);
+          });
+          // Now register a dummy extension to initilize the Scratch object
+          const dummyURL = 'data:text/plain,/*Im a dummy*/'+Date.now();
+          await this.props.registerExt.url(dummyURL);
+          vm.extensionManager.workerURLS.pop();
+          // Some cleanup
+          document.querySelector(`script[src="${dummyURL}"]`).remove();
+        } else {
+          return this.props.registerExt.plugin(extension);
+        }
+      },
+    }
   }
 }
 // Export the Scratch* class

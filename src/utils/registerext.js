@@ -20,9 +20,18 @@ class ExtensionRegisterer {
       return 'unsandboxed';
     }
     // Load the URL
-    await extensionManager.loadExtensionURL(url);
-    // And reset the security manager so that we dont get vulnerabilitys
-    securityManager.getSandboxMode = old;
+    let loadedCorrectly = true;
+    try {
+      await extensionManager.loadExtensionURL(url);
+    } catch(error) {
+      if (error.message == 'Too late to register new extensions.') loadedCorrectly = false;
+      else loadedCorrectly = error;
+    } finally {
+      // And reset the security manager so that we dont get vulnerabilitys
+      securityManager.getSandboxMode = old;
+      if (typeof loadedCorrectly === 'boolean') return loadedCorrectly;
+      throw loadedCorrectly;
+    }
   }
 }
 module.exports = ExtensionRegisterer;
