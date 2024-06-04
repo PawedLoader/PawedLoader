@@ -11,4 +11,3 @@
 // @grant        none
 // @license      MIT and LGPL-3.0
 // ==/UserScript==
-// happy birthday technoblade :party:

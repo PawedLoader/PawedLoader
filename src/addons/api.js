@@ -11,6 +11,9 @@ class AddonAPI {
     return {};
   }
   // Internal stuff for addons
+  requireProp(propName) {
+    return this.props[propName];
+  }
   async getBlockly() {
     return (await this.IntermediaryScratch.gui.getBlockly());
   }

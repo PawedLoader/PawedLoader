@@ -1,2 +1,2 @@
 // Addon files
-module.exports = ['coloredinsertion'];
+module.exports = ['coloredinsertion', 'syntaxvisualreport'];

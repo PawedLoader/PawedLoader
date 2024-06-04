@@ -19,6 +19,9 @@ module.exports = class PawedLoader {
       get defs() {
         return (self.cache['./defs']=self.cache['./defs']??require('./defs'));
       },
+      get highlighter() {
+        return (self.cache['./modules/highlight.min.js']=self.cache['./modules/highlight.min.js']??require('./modules/highlight.min.js'));
+      },
     };
     // These props require stuff from the original props to function so we do it here
     this.props = {
@@ -36,7 +39,7 @@ module.exports = class PawedLoader {
     // we setup Scratch all the way over here as to not miss any exports that it needs
     // we dont have to worry about anything requiring it because they are lazilly loaded
     this.props.Scratch = new (require('./classes/IntermediaryScratch'))(self.props);
-    this.props.Scratch.setup();
+    await this.props.Scratch.setup();
     // The almighty GUI needs the editor so we do it last :p
     this.props.GUI = new (require('./gui'))(this.props);
   }

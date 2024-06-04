@@ -1,0 +1,1 @@
+module.exports = (value) => (new DOMParser().parseFromString(value, 'text/xml').documentElement.nodeName !== 'parsererror');
