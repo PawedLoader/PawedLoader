@@ -6,6 +6,7 @@ module.exports = (function() {
     addonAPI = api;
     addonData = api.getData(addonID);
     const highlighter = api.requireProp('highlighter');
+    const xmlEscape = require('../../utils/xmlEscape');
     const vm = await api.getVM();
     api.getBlockly().then((Blockly) => {
       Blockly.WorkspaceSvg.prototype.reportValueHTML = function(id, html) {
@@ -47,14 +48,19 @@ module.exports = (function() {
             }
           }
           value = String(value);
-          if (require('../../utils/isJSON')(value)) {
+          const cValue = value.toLowerCase(); // Used for comparisons
+          if (cValue == 'infinity' || cValue == 'nan') {
+            html = `<span class="highlighter-purple">${xmlEscape(value)}</span>`;
+          } else if (cValue == 'null') {
+            html = `<span class="highlighter-null">${xmlEscape(value)}</span>`;
+          } else if (cValue == 'undefined') {
+            html = `<span class="highlighter-gray">${xmlEscape(value)}</span>`;
+          } else if ((Number(cValue) !== NaN) || cValue == 'true' || cValue == 'false') {
+            html = highlighter.highlight(value, {language: 'javascript'}).value;
+          } else if (require('../../utils/isJSON')(value)) {
             html = highlighter.highlight(value, {language: 'json'}).value;
-          } else if(require('../../utils/isXML')(value)) {
+          } else if (require('../../utils/isXML')(value)) {
             html = highlighter.highlight(value, {language: 'xml'}).value;
-          } else {
-            if ((Number(value) !== NaN) || value == 'true' || value == 'false' || value == 'NaN') {
-              html = highlighter.highlight(value, {language: 'javascript'}).value;
-            }
           }
           if (html && !isMalf(value)) {
             ws.reportValueHTML(id, html);

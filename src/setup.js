@@ -20,7 +20,7 @@ module.exports = class PawedLoader {
         return (self.cache['./defs']=self.cache['./defs']??require('./defs'));
       },
       get highlighter() {
-        return (self.cache['./modules/highlight.min.js']=self.cache['./modules/highlight.min.js']??require('./modules/highlight.min.js'));
+        return (self.cache['./modules/highlighter.min.js']=self.cache['./modules/highlighter.min.js']??require('./modules/highlighter.min.js'));
       },
     };
     // These props require stuff from the original props to function so we do it here
