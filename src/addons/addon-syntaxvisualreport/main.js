@@ -5,7 +5,7 @@ module.exports = (function() {
   async function setup(api) {
     addonAPI = api;
     addonData = api.getData(addonID);
-    const hljs = api.requireProp('highlighter');
+    const highlighter = api.requireProp('highlighter');
     const vm = await api.getVM();
     api.getBlockly().then((Blockly) => {
       Blockly.WorkspaceSvg.prototype.reportValueHTML = function(id, html) {
@@ -48,17 +48,17 @@ module.exports = (function() {
           }
           value = String(value);
           if (require('../../utils/isJSON')(value)) {
-            html = hljs.highlight(value, {language: 'json'}).value;
+            html = highlighter.highlight(value, {language: 'json'}).value;
           } else if(require('../../utils/isXML')(value)) {
-            html = hljs.highlight(value, {language: 'xml'}).value;
+            html = highlighter.highlight(value, {language: 'xml'}).value;
           } else {
             if ((Number(value) !== NaN) || value == 'true' || value == 'false' || value == 'NaN') {
-              html = hljs.highlight(value, {language: 'javascript'}).value;
+              html = highlighter.highlight(value, {language: 'javascript'}).value;
             }
           }
           if (html && !isMalf(value)) {
             ws.reportValueHTML(id, html);
-            Blockly.DropDownDiv.DIV_.classList.add('hljs');
+            Blockly.DropDownDiv.DIV_.classList.add('highlighter');
             return true;
           }
         } else {
