@@ -1,2 +1,2 @@
 // Addon files
-module.exports = ['coloredinsertion', 'syntaxvisualreport'];
+module.exports = ['coloredinsertion', 'syntaxvisualreport', 'shadowmanager'];
