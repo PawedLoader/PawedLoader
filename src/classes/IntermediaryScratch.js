@@ -53,9 +53,11 @@ class IntermediaryScratch {
     this.gui = {}, this.vm = null, this.renderer = null, this.extensions = {
       unsandboxed: true,
       register() {throw new Error('Not implemented yet.')},
-    };
+    }, this.ScratchLeak = null;
     // Patch the this.gui object so that we can use Scratch.gui.getBlockly without issues
     patchGetBlockly(this);
+    // Run some global patches on Blockly
+    this.gui.getBlockly().then((Blockly) => (require('../patches/GlobalBlocklyPatches')(Blockly)));
     // The basics
     this.BlockType = {
       // https://github.com/TurboWarp/scratch-vm/blob/develop/src/extension-support/block-type.js
@@ -106,6 +108,7 @@ class IntermediaryScratch {
     this.renderer = vm.runtime.renderer;
     // When the API is created (the REAL Scratch object) modify it and update our export
     vm.on('CREATE_UNSANDBOXED_EXTENSION_API', Scratch => {
+      this.ScratchLeak = Scratch;
       patchGetBlockly(Scratch);
     });
     // The registrar
