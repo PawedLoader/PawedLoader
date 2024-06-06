@@ -21,7 +21,6 @@ module.exports = (function() {
         if (value === '') return true;
       }
       api.getBlockly().then((Blockly) => {
-        sharedBlocklyCallback(Blockly);
         const rvr = vm.runtime.visualReport;
         vm.runtime.visualReport = function(...args) {
           const [id, valInit] = args;
@@ -69,7 +68,6 @@ module.exports = (function() {
     // Todo: do a check to see if this is enabled
     if (true) {
       api.getBlockly().then((Blockly) => {
-        sharedBlocklyCallback(Blockly);
         const rvr = vm.runtime.visualReport;
         vm.runtime.visualReport = function(...args) {
           const [id, value] = args;
@@ -91,7 +89,6 @@ module.exports = (function() {
     // Todo: do a check to see if this is enabled
     if (true) {
       api.getBlockly().then((Blockly) => {
-        sharedBlocklyCallback(Blockly);
         const rvr = vm.runtime.visualReport;
         vm.runtime.visualReport = function(...args) {
           const [id, value] = args;
